@@ -86,6 +86,14 @@
 .wf-dfield:last-child{margin-bottom:0}
 .wf-dfield b{color:var(--pb-navy)}
 .wf-dtext{white-space:pre-line}
+.wf-prep{background:#eef5ff;border:1px solid #cfe0f5;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.wf-preptit{font-weight:800;color:var(--pb-navy);font-size:13px;margin-bottom:8px}
+.wf-mbadge{display:inline-block;background:var(--pb-navy);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px}
+.wf-form{display:block;background:var(--pb-bg);border:1px solid var(--pb-line);border-radius:8px;
+  padding:8px 11px;margin-bottom:5px;font-size:13px;font-weight:600;color:var(--pb-navy);text-decoration:none}
+.wf-form:hover{border-color:var(--pb-navy2);background:var(--pb-tint)}
+.wf-doctag{display:inline-block;background:#fdf3e0;color:#8a5a12;font-size:12px;font-weight:600;
+  border-radius:6px;padding:2px 8px;margin:0 5px 5px 0}
 .wf-morebtn{background:none;border:none;color:var(--pb-navy);font-size:12px;font-weight:700;
   cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
 .wf-foot{font-size:12px;color:var(--pb-muted);margin-top:24px;line-height:1.8}
@@ -454,21 +462,42 @@
       '<span class="wf-dtext" style="display:none">' + esc(txt) + "</span> " +
       '<button class="wf-morebtn">더보기</button>';
   }
+  // 선정기준 등 텍스트에서 '○○증명서/등본/신청서' 류 서류 언급 추출(참고용)
+  function extractDocs(d) {
+    var blob = [d.target, d.criteria, d.content, (d.apply || []).join(" ")].join(" ");
+    var re = /([가-힣]{2,10}(?:증명서|확인서|등본|초본|신청서|동의서|진단서|위임장|통장\s?사본|신분증))/g;
+    var seen = {}, out = [], m;
+    while ((m = re.exec(blob)) !== null) { var s = m[1].replace(/\s/g, ""); if (!seen[s]) { seen[s] = 1; out.push(s); } }
+    return out.slice(0, 8);
+  }
   function buildDetail(d) {
     var h = "";
+    // ★ 준비 안내를 맨 위에 — 사람이 '무엇을 받아 어떻게 내는지' 먼저 보게
+    var prep = "";
+    if (d.apply && d.apply.length) {
+      prep += d.apply.map(function (a) { return '<span class="wf-mbadge">' + esc(a) + " 신청</span>"; }).join(" ");
+    }
+    var docs = extractDocs(d);
+    if (prep || (d.forms && d.forms.length) || docs.length) {
+      h += '<div class="wf-prep"><div class="wf-preptit">📎 준비 안내</div>';
+      if (prep) h += '<div style="margin-bottom:8px">' + prep + "</div>";
+      if (d.forms && d.forms.length) {
+        h += '<div style="font-size:12px;color:var(--pb-muted);margin-bottom:3px">신청 서식 — 내려받아 작성하세요</div>';
+        h += d.forms.map(function (f) {
+          return '<a class="wf-form" href="' + esc(f.link) + '" target="_blank" rel="noopener">📄 ' + esc(f.name) + " ↓</a>";
+        }).join("");
+      }
+      if (docs.length) {
+        h += '<div style="font-size:12px;color:var(--pb-muted);margin:8px 0 3px">본문에 언급된 서류(참고 — 정확한 구비서류는 위 서식·문의처 확인)</div>';
+        h += docs.map(function (x) { return '<span class="wf-doctag">' + esc(x) + "</span>"; }).join("");
+      }
+      h += "</div>";
+    }
     [["지원대상", d.target], ["선정기준", d.criteria], ["서비스내용", d.content]].forEach(function (p) {
       if (p[1] && String(p[1]).trim()) {
         h += '<div class="wf-dfield"><b>' + p[0] + "</b><br>" + clampText(p[1]) + "</div>";
       }
     });
-    if (d.apply && d.apply.length) {
-      h += '<div class="wf-dfield"><b>신청방법</b><br><span class="wf-dtext">' + esc(d.apply.join(" · ")) + "</span></div>";
-    }
-    if (d.forms && d.forms.length) {
-      h += '<div class="wf-dfield"><b>신청서식</b><br>' + d.forms.map(function (f) {
-        return esc(f.name) + ' <a href="' + esc(f.link) + '" target="_blank" rel="noopener">내려받기 ↗</a>';
-      }).join("<br>") + "</div>";
-    }
     if (d.contacts && d.contacts.length) {
       h += '<div class="wf-dfield"><b>문의처</b><br><span class="wf-dtext">' + esc(d.contacts.join("\n")) + "</span></div>";
     }
