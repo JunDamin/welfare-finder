@@ -17,15 +17,37 @@
 ## 데이터 출처와 신뢰 등급
 
 - 출처: [복지로](https://www.bokjiro.go.kr) 공개 복지서비스 목록
-- **수집일: 2026-06-11** (이후 변경분은 반영되지 않음)
+- **수집일**: `index.html`의 `COLLECTED_AT` 상수 참조 — 일일 파이프라인이 자동 갱신 (아래 "데이터 파이프라인")
 - 태그 분류: **86%는 복지로 공식 분류**, 나머지 14%는 키워드 자동분류(`confidence` 필드에 명시)
 - 결과는 신뢰 2등급으로 구분 표시합니다:
   - ⭐ 검증 큐레이션(15건): 사람이 공식 출처 확인 — 서류·택1 분기(가정양육수당↔보육료)·소득 기준 필터까지 지원
   - 🔄 복지로 전체(5,012건): 공개 데이터를 그대로 비추는 거울 — 이름·요약·기관·복지로 상세 링크만 제공
 
-### 재수집 방법
+## 데이터 파이프라인 (이슈 #3 — 전수 상세 수집 자동화)
 
-`welfare_full.json`은 복지로 공개 목록을 스크립트로 수집한 스냅샷입니다. 갱신하려면 원 수집 스크립트(별도 리포 `playbook-dryrun-welfare-fasthtml`의 데이터 파이프라인)를 다시 실행해 `data/welfare_full.json`을 교체하고, `index.html`·이 문서의 수집일을 갱신하세요.
+핵심 KPI는 **상세 보유 건수**입니다. 일일 API 쿼터(중앙 상세 100/일, 지자체 상세 1,000/일)가 희소자원이므로, 파이프라인은 **멱등 누적**(이미 수집한 servId는 재호출 0)을 보장합니다.
+
+```
+data/welfare.db (SQLite, 정본)
+  ├─ services          목록 5,012건 (welfare_full 필드 + kind: central/local)
+  ├─ central_details   중앙부처 상세 (servId PK)
+  ├─ local_details     지자체 상세 (servId PK)
+  └─ meta              collected_at 등
+        │
+        ▼  pipeline/export_site.py
+data/welfare_full.json + data/central_details.json (사이트 서빙 — 파일명·스키마 불변)
++ index.html의 COLLECTED_AT 상수 갱신
+```
+
+| 스크립트 | 역할 |
+|---|---|
+| `pipeline/init_db.py` | 기존 JSON 산출물을 DB로 1회 시드 (이미 시드된 DB면 건너뜀) |
+| `pipeline/collect_daily.py` | **멱등 일일 수집** — DB에 없는 servId만 호출 (중앙 ≤90, 지자체 ≤950, 0.15s 슬립, 1회 재시도, 쿼터 초과 코드 22 감지 시 즉시 중단). `--limit N`은 테스트 모드(중앙 0, 지자체 N건) |
+| `pipeline/export_site.py` | DB → 서빙 JSON 재생성. `central_details.json`은 중앙+지자체 상세 병합(키가 servId라 충돌 없음) |
+
+- **자동화**: `.github/workflows/collect.yml` — 매일 18:00 UTC(한국 03:00, 쿼터 리셋 직후) cron + 수동 실행. 변경분만 커밋·푸시, 실패 시 새 이슈 자동 생성.
+- **인증키**: GitHub Actions에서는 `secrets.DATA_GO_KR_KEY`, 로컬에서는 env `DATA_GO_KR_KEY` 또는 이웃 리포의 `.apikey` 폴백. 키는 로그·에러를 포함한 어떤 출력에도 노출되지 않습니다.
+- **서빙 계약**: `welfare_full.json`의 스키마(키 구성·순서 포함)는 변경하지 않습니다 — `index.html` 무수정 원칙.
 
 ## 로컬 실행
 

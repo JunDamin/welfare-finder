@@ -1,2 +1,4 @@
 .omc/
 .apikey
+__pycache__/
+*.pyc

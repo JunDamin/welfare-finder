@@ -1,0 +1,67 @@
+name: daily-detail-collect
+
+on:
+  schedule:
+    - cron: "0 18 * * *"   # 매일 18:00 UTC = 한국 03:00 (data.go.kr 쿼터는 자정 KST 리셋)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install httpx
+
+      - name: Collect details (idempotent — only servIds missing from DB)
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python pipeline/collect_daily.py
+
+      - name: Export site JSON from DB
+        run: python pipeline/export_site.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/welfare.db data/welfare_full.json data/central_details.json index.html
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "data: 일일 상세 수집 $(date -u -d '+9 hours' +%F) (auto)"
+            git push
+          fi
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `일일 상세 수집 실패 (${new Date().toISOString().slice(0, 10)})`,
+              body: [
+                "자동 수집 워크플로가 실패했습니다.",
+                "",
+                `- 실행 로그: ${runUrl}`,
+                "- 확인 사항: secrets.DATA_GO_KR_KEY 등록 여부, 일일 쿼터(중앙 100/지자체 1,000), API 게이트웨이 상태",
+                "",
+                "_collect.yml이 자동 생성한 이슈입니다._",
+              ].join("\n"),
+            });
