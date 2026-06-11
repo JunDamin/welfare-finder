@@ -1,0 +1,173 @@
+[
+  {
+    "name": "부모급여",
+    "tags": ["영아"],
+    "income_max": null,
+    "benefit": "0세 월 100만원 / 1세 월 50만원 (2025)",
+    "how_to_apply": "출생신고 시 동시신청 또는 복지로·정부24",
+    "documents": ["사회보장급여 신청(변경)서", "통장 사본", "신청인 신분증"],
+    "deadline": "출생 60일 내 신청 권장",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00004657",
+    "confidence": "확인 필요"
+  },
+  {
+    "name": "아동수당",
+    "tags": ["영아", "영유아", "아동"],
+    "income_max": null,
+    "benefit": "8세 미만 아동 월 10만원",
+    "how_to_apply": "복지로·정부24 또는 주민센터",
+    "documents": ["사회보장급여 신청(변경)서", "통장 사본", "신청인 신분증"],
+    "deadline": "상시(출생신고 시 통합신청 가능)",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00001171",
+    "confidence": "확인 필요"
+  },
+  {
+    "name": "첫만남이용권",
+    "tags": ["출산", "영아"],
+    "income_max": null,
+    "benefit": "첫째 200만원 / 둘째 이상 300만원 (국민행복카드 바우처)",
+    "how_to_apply": "출생신고 후 복지로 또는 주민센터(국민행복카드)",
+    "documents": ["출산서비스 통합처리 신청서 또는 사회보장급여 신청서", "신청인 신분증"],
+    "deadline": "출생 후 1년 내(신고 후 60일 내 통합신청 권장)",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00004656",
+    "confidence": "확인 필요"
+  },
+  {
+    "name": "가정양육수당",
+    "tags": ["영아", "영유아"],
+    "care_type": "home",
+    "income_max": null,
+    "benefit": "어린이집·유치원 미이용 시 월 10만원(연령별 상이)",
+    "how_to_apply": "복지로 또는 주민센터",
+    "documents": ["사회보장급여 신청(변경)서", "신청인 신분증"],
+    "deadline": "상시",
+    "source_url": "https://www.bokjiro.go.kr",
+    "confidence": "확인 필요(어린이집 이용 시 보육료와 택1)"
+  },
+  {
+    "name": "어린이집 보육료 지원",
+    "tags": ["영아", "영유아"],
+    "care_type": "center",
+    "income_max": null,
+    "benefit": "어린이집 보육료(아이행복카드)",
+    "how_to_apply": "복지로·정부24(아이행복카드 발급)",
+    "documents": ["보육료 지원 신청서", "신청인 신분증", "아이행복카드"],
+    "deadline": "이용 전 신청",
+    "source_url": "https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13510000024",
+    "confidence": "확인 필요(가정양육수당과 택1)"
+  },
+  {
+    "name": "아이돌봄서비스",
+    "tags": ["영아", "영유아", "아동"],
+    "income_max": 150,
+    "benefit": "돌봄 비용 소득별 차등 지원",
+    "how_to_apply": "아이돌봄 누리집·복지로",
+    "documents": ["아이돌봄 서비스 지원신청서", "소득·재산 신고서", "소득·재산 확인 서류", "신청인 신분증"],
+    "deadline": "상시",
+    "source_url": "https://www.idolbom.go.kr/front/srvcUtztnGuide",
+    "confidence": "확인 필요(소득 기준 차등)"
+  },
+  {
+    "name": "서울형 산후조리경비",
+    "tags": ["출산"],
+    "region": "서울",
+    "income_max": null,
+    "benefit": "출생아당 100만원(서울 거주·소득무관)",
+    "how_to_apply": "서울맘케어·주민센터",
+    "documents": ["신청인 신분증", "통장 사본", "출생(가족관계) 증빙"],
+    "deadline": "출산일 기준 신청기간 확인",
+    "source_url": "https://www.gov.kr/portal/onestopSvc/happyBirthLocalBirth",
+    "confidence": "확인 필요(서울 거주·자치구별 상이)"
+  },
+  {
+    "name": "경기 산후조리비",
+    "tags": ["출산"],
+    "region": "경기",
+    "income_max": null,
+    "benefit": "출생아당 50만원 지역화폐(경기 거주·소득무관)",
+    "how_to_apply": "경기민원24·주민센터",
+    "documents": ["신청인 신분증", "통장 사본", "출생(가족관계) 증빙"],
+    "deadline": "출생일로부터 신청기간 확인",
+    "source_url": "https://www.gov.kr/portal/onestopSvc/happyBirthLocalBirth",
+    "confidence": "확인 필요(경기 거주·시군 추가 상이)"
+  },
+  {
+    "name": "인천 아이플러스 지원(i+1억드림)",
+    "tags": ["출산", "영아"],
+    "region": "인천",
+    "income_max": null,
+    "benefit": "인천 거주 출생아 단계별 지원(천사지원금·아이꿈수당 등, 18세까지)",
+    "how_to_apply": "인천 주민센터·아이플러스",
+    "documents": ["신청인 신분증", "통장 사본", "출생(가족관계) 증빙"],
+    "deadline": "연령 단계별 신청",
+    "source_url": "https://www.gov.kr/portal/onestopSvc/happyBirthLocalBirth",
+    "confidence": "확인 필요(인천 거주·세부 상이)"
+  },
+  {
+    "name": "기초연금",
+    "tags": ["어르신"],
+    "income_max": null,
+    "benefit": "월 최대 약 34만원(2025) — 만 65세+, 소득인정액 단독 228만/부부 364.8만 이하",
+    "how_to_apply": "복지로·주민센터·국민연금공단",
+    "documents": ["사회보장급여 신청(변경)서", "소득·재산 신고서", "금융정보 등 제공 동의서", "통장 사본", "신청인 신분증"],
+    "deadline": "만 65세 생일 1개월 전부터 신청 가능",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00001164",
+    "confidence": "확인 필요(소득인정액 기준 별도)"
+  },
+  {
+    "name": "한부모가족 아동양육비 지원",
+    "tags": ["한부모"],
+    "income_max": 63,
+    "benefit": "자녀 1인당 월 23만원(청소년한부모 월 35만원) — 18세 미만 자녀, 중위 63% 이하",
+    "how_to_apply": "복지로·주민센터",
+    "documents": ["사회보장급여 신청(변경)서", "소득·재산 신고서", "가족관계증명서", "통장 사본", "신청인 신분증"],
+    "deadline": "상시",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00001068",
+    "confidence": "확인 필요(소득·자격 기준)"
+  },
+  {
+    "name": "다자녀 전기요금 할인",
+    "tags": ["다자녀"],
+    "income_max": null,
+    "benefit": "주택용 전기요금 월 30% 할인(월 1.6만원 한도) — 자녀 3인+ 또는 가구원 5인+",
+    "how_to_apply": "한전 cyber.kepco.co.kr·☎123 또는 행정복지센터",
+    "documents": ["요금감면 신청서", "주민등록등본", "신청인 신분증"],
+    "deadline": "상시",
+    "source_url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/B41000200003",
+    "confidence": "확인 필요(자녀 수·가구원 기준)"
+  },
+  {
+    "name": "생계급여",
+    "tags": ["저소득"],
+    "income_max": 32,
+    "benefit": "중위 32% 이하 가구 생계비 지원(4인 기준 약 195만원 이하)",
+    "how_to_apply": "복지로·주민센터",
+    "documents": ["사회보장급여 신청(변경)서", "금융정보 등 제공 동의서", "소득·재산 신고서", "통장 사본", "신청인 신분증"],
+    "deadline": "상시",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00001132",
+    "confidence": "확인 필요(소득인정액 기준)"
+  },
+  {
+    "name": "주거급여",
+    "tags": ["저소득"],
+    "income_max": 48,
+    "benefit": "중위 48% 이하 가구 임차료·수선비 지원",
+    "how_to_apply": "복지로·주민센터",
+    "documents": ["사회보장급여 신청(변경)서", "금융정보 등 제공 동의서", "소득·재산 신고서", "임대차 계약서", "통장 사본", "신청인 신분증"],
+    "deadline": "상시",
+    "source_url": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00003201",
+    "confidence": "확인 필요(소득인정액 기준)"
+  },
+  {
+    "name": "강남구 출산양육지원금",
+    "tags": ["출산"],
+    "region": "서울 강남구",
+    "income_max": null,
+    "benefit": "첫째·둘째 각 200만 / 셋째 300만 / 넷째 500만 (현금, 강남구 거주·전입요건)",
+    "how_to_apply": "강남구청·주민센터",
+    "documents": ["신청인 신분증", "통장 사본", "출생(가족관계) 증빙"],
+    "deadline": "출생 후 신청기간·전입요건 확인",
+    "source_url": "https://easylaw.go.kr/CSP/CnpClsOrdinMain.laf?popMenu=ov&areaCsmOrdinSeq=209&ccfNo=1&cciNo=1&cnpClsNo=1",
+    "confidence": "확인 필요(강남구 거주·전입요건·자치구별 상이)"
+  }
+]

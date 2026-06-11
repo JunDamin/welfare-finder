@@ -1,0 +1,66 @@
+/* design/tokens.css — 플레이북 디자인 토큰의 '실행 가능한' 구현체 (스택 무관)
+   사용: 정적 HTML이면 <link>, FastHTML이면 Style()/hdrs 주입, 어느 프레임워크든 동일.
+   값의 진실원천: design-tokens.md. 클래스는 전부 .pb- 프리픽스(UI 프레임워크 충돌 방지 — FrankenUI .hero 충돌 실증). */
+
+:root{
+  --pb-navy:#15314f; --pb-navy2:#2a5180; --pb-ink:#1b2330; --pb-muted:#5d6877;
+  --pb-line:#d9e1ea; --pb-tint:#f4f7fb; --pb-bg:#ffffff; --pb-accent:#c2741a;
+  --pb-ok:#1d8a3c; --pb-warn:#d99413; --pb-bad:#cc2f2f;
+  /* 8pt 그리드 */ --pb-s1:4px; --pb-s2:8px; --pb-s3:12px; --pb-s4:16px; --pb-s5:24px; --pb-s6:32px; --pb-s7:48px;
+}
+body{background:var(--pb-tint);color:var(--pb-ink);
+     font-family:Pretendard,-apple-system,"Noto Sans KR",sans-serif}
+
+/* 레이아웃 */
+.pb-wrap{max-width:760px;margin:0 auto;padding:40px 20px 64px}
+
+/* 히어로(첫 10초 — 한 가지만 이해시키기) */
+.pb-hero{margin-bottom:var(--pb-s6)}
+.pb-hero .pb-badge{display:inline-block;background:var(--pb-navy);color:#fff;font-size:12px;
+  font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:var(--pb-s3)}
+.pb-hero h1{font-size:30px;font-weight:800;line-height:1.3;margin:0 0 var(--pb-s2);color:var(--pb-navy)}
+.pb-hero p{color:var(--pb-muted);margin:0;font-size:15px}
+
+/* 카드 + 단계 배지 */
+.pb-card{background:var(--pb-bg);border:1px solid var(--pb-line);border-radius:14px;
+  padding:28px;margin-bottom:20px;box-shadow:0 1px 2px rgba(21,49,79,.04)}
+.pb-step{display:flex;gap:var(--pb-s3);align-items:flex-start;margin-bottom:var(--pb-s4)}
+.pb-stepnum{flex:none;width:28px;height:28px;border-radius:999px;background:var(--pb-navy);color:#fff;
+  font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.pb-step h2{font-size:18px;font-weight:800;margin:2px 0}
+.pb-step .pb-sub{font-size:13px;color:var(--pb-muted)}
+
+/* 폼 */
+label.pb-l{display:block;font-size:13px;font-weight:700;margin:14px 0 6px;color:var(--pb-ink)}
+input.pb-i,textarea.pb-i,select.pb-i{width:100%;border:1px solid var(--pb-line);border-radius:10px;
+  padding:11px 13px;font-size:14px;background:var(--pb-bg);font-family:inherit;color:var(--pb-ink)}
+input.pb-i:focus,textarea.pb-i:focus,select.pb-i:focus{outline:2px solid var(--pb-navy2);border-color:var(--pb-navy2)}
+.pb-row{display:flex;gap:var(--pb-s4)}.pb-row>div{flex:1}
+
+/* 버튼 — 문구는 행동 동사로(lessons/ux §7) */
+.pb-btn{background:var(--pb-navy);color:#fff;font-weight:700;font-size:15px;border:none;
+  border-radius:10px;padding:13px 22px;cursor:pointer;margin-top:var(--pb-s4)}
+.pb-btn:hover{background:var(--pb-navy2)}
+.pb-btn2{background:var(--pb-bg);color:var(--pb-navy);font-weight:700;border:1px solid var(--pb-line);
+  border-radius:10px;padding:11px 18px;cursor:pointer}
+
+/* 정보 박스 */
+.pb-route{background:var(--pb-tint);border-radius:10px;padding:14px 16px;margin:var(--pb-s3) 0;font-size:14px}
+.pb-route .pb-lab{font-size:12px;font-weight:700;color:var(--pb-muted);text-transform:uppercase;margin-bottom:4px}
+.pb-note{background:#fdecec;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:14px}
+.pb-next{background:var(--pb-tint);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--pb-muted)}
+
+/* 점검 리스트(✓/!) — 갭점검·체크리스트 공용 */
+.pb-gaps{list-style:none;padding:0;margin:var(--pb-s2) 0 0}
+.pb-gaps li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;
+  margin-bottom:var(--pb-s2);font-size:14px}
+.pb-gaps .pb-miss{background:#fdf3e0}.pb-gaps .pb-okk{background:#e9f6ec}
+.pb-gaps .pb-ic{flex:none;width:20px;height:20px;border-radius:999px;color:#fff;font-size:12px;
+  font-weight:800;display:flex;align-items:center;justify-content:center}
+.pb-gaps .pb-miss .pb-ic{background:var(--pb-warn)}.pb-gaps .pb-okk .pb-ic{background:var(--pb-ok)}
+.pb-gapsum{font-weight:700;color:var(--pb-bad);font-size:14px;margin:4px 0 0}
+
+/* 시그널(위험/상태 색은 의미로만) */
+.pb-sig-ok{color:var(--pb-ok)}.pb-sig-warn{color:var(--pb-warn)}.pb-sig-bad{color:var(--pb-bad)}
+
+@media(max-width:480px){.pb-row{flex-direction:column;gap:0}.pb-hero h1{font-size:24px}}
