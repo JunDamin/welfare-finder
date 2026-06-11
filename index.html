@@ -67,6 +67,27 @@
 .wf-more{background:var(--pb-tint);border-radius:10px;padding:12px 14px;font-size:13px;
   color:var(--pb-muted);margin-top:8px}
 .wf-empty{background:var(--pb-tint);border-radius:10px;padding:16px;font-size:14px;color:var(--pb-muted)}
+/* 필터 적용범위 안내 (이슈 #1) */
+.wf-scope{background:var(--pb-tint);border-radius:8px;padding:9px 13px;font-size:13px;
+  color:var(--pb-muted);margin:4px 0 2px;line-height:1.6}
+.wf-scope-warn{background:#fdf3e0;color:var(--pb-ink);border:1px solid #f0d9a8}
+/* 새 필드 배지 (이슈 #2) */
+.wf-online{display:inline-block;background:#e9f6ec;color:var(--pb-ok);font-size:11px;font-weight:700;
+  border-radius:999px;padding:1px 7px;margin-left:6px}
+.wf-pc{font-size:11px;color:var(--pb-muted);margin-left:6px}
+/* 상세 펼침 (이슈 #2) */
+.wf-dtoggle{background:none;border:1px solid var(--pb-line);border-radius:6px;color:var(--pb-navy);
+  font-size:12px;font-weight:700;padding:3px 10px;margin-top:6px;cursor:pointer;font-family:inherit}
+.wf-dtoggle:hover{background:var(--pb-tint);border-color:var(--pb-navy2)}
+.wf-detail{display:none;background:var(--pb-tint);border-radius:10px;padding:12px 14px;
+  margin-top:8px;font-size:13px;line-height:1.7}
+.wf-detail.wf-open{display:block}
+.wf-dfield{margin-bottom:10px}
+.wf-dfield:last-child{margin-bottom:0}
+.wf-dfield b{color:var(--pb-navy)}
+.wf-dtext{white-space:pre-line}
+.wf-morebtn{background:none;border:none;color:var(--pb-navy);font-size:12px;font-weight:700;
+  cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
 .wf-foot{font-size:12px;color:var(--pb-muted);margin-top:24px;line-height:1.8}
 @media(max-width:480px){.pb-mets{flex-direction:column;gap:8px}}
 </style>
@@ -79,7 +100,7 @@
     <div class="pb-badge">맞춤 복지 찾기 · 정적 도구</div>
     <h1>우리 가족이 받을 수 있는 지원,<br>상황만 켜면 빠짐없이.</h1>
     <p>검색이 아닙니다 — 조건이 자격을 정합니다. 해당되는 상황을 켜기만 하면 통합 준비물까지 받아 가세요.</p>
-    <div class="wf-datalabel">📊 복지로 5,012건 · 2026-06-11 수집 · 86% 복지로 공식 분류</div><br>
+    <div class="wf-datalabel">📊 복지로 5,012건 · 2026-06-11 수집 · 88% 공공데이터포털 공식 태그</div><br>
     <button class="wf-demo" id="wf-demo">▶ 예시로 먼저 보기: 영유아 + 임신·출산 + 한부모 + 서울 강남구</button>
   </div>
 
@@ -365,30 +386,56 @@
     };
     if (!FULL) {
       headBox.innerHTML = headTitle("복지로 전체에서 더 찾기",
-        "복지로 " + COLLECTED_AT + " 수집 · 5,012건 · 86%는 복지로 공식 분류 — 로딩 중입니다.");
+        "복지로 " + COLLECTED_AT + " 수집 · 5,012건 · 88%는 공공데이터포털 공식 태그 — 로딩 중입니다.");
       return;
     }
     var act = activeTags(), loc = currentLoc();
     var hits = WF.matchFull(FULL, act, loc, state.q);
+    // KPI 원칙(이슈 #2·#3): 상세 보유(큐레이션 등급) 우선 정렬 — 행동 가능한 것부터
+    hits = hits.slice().sort(function (a, b) {
+      var da = WF.details && WF.details[a.id] ? 0 : 1;
+      var db = WF.details && WF.details[b.id] ? 0 : 1;
+      if (da !== db) return da - db;
+      var ra = a.region ? 1 : 0, rb = b.region ? 1 : 0;
+      if (ra !== rb) return ra - rb;
+      return a.name < b.name ? -1 : 1;
+    });
+    var nDetail = hits.filter(function (h) { return WF.details && WF.details[h.id]; }).length;
     var nCentral = hits.filter(function (h) { return !h.region; }).length;
+    // 이슈 #1: 이 섹션은 상황·지역만 매칭 — 소득/보육/서류 스위치는 미적용임을 명시
+    var unapplied = state.income !== null || state.on.has("child");
+    var scopeNote = unapplied
+      ? '<div class="wf-scope wf-scope-warn">⚠️ <strong>지금 선택한 소득/보육 조건은 이 목록엔 적용되지 않습니다.</strong> ' +
+        "이 목록은 <strong>상황·지역 기준 매칭</strong>이에요 — 자격·금액은 각 항목의 복지로 상세에서 확인하세요.</div>"
+      : '<div class="wf-scope">이 목록은 <strong>상황·지역 기준 매칭</strong>입니다 — 소득·보육형태·서류 스위치는 적용되지 않아요. ' +
+        "자격·금액은 각 항목의 복지로 상세에서 확인하세요.</div>";
     headBox.innerHTML = headTitle(
       "복지로 전체에서 " + hits.length.toLocaleString() + "건 " + (act.size ? "더 찾았어요" : "(상황을 켜면 좁혀져요)") +
       " <span style=\"font-weight:600;font-size:13px;color:var(--pb-muted)\">전국 " + nCentral +
-      " · 지역 " + (hits.length - nCentral) + "</span>",
-      "복지로 " + COLLECTED_AT + " 수집 · 86%는 복지로 공식 분류 — 자격·금액은 상세에서 확인하세요." +
-      (loc ? "" : " 지역을 고르면 지자체 지원도 함께 나옵니다."));
+      " · 지역 " + (hits.length - nCentral) +
+      (nDetail ? ' · <span style="color:var(--pb-ok)">📖 자세히 보기 가능 ' + nDetail + "건</span>" : "") + "</span>",
+      "복지로 " + COLLECTED_AT + " 수집 · 88%는 공공데이터포털 공식 태그 — 자격·금액은 상세에서 확인하세요." +
+      (loc ? "" : " 지역을 고르면 지자체 지원도 함께 나옵니다.")) + scopeNote;
     var shown = hits.slice(0, CAP);
     listBox.innerHTML = shown.map(function (it) {
       var reg = it.region;
       var ben = it.benefit || "";
       if (ben.length > 120) ben = ben.slice(0, 120) + "…";
-      var confCls = it.confidence === "복지로 공식 분류" ? "wf-conf-off" : "wf-conf-auto";
+      var confCls = it.confidence === "공공데이터포털 공식" ? "wf-conf-off" : "wf-conf-auto";
+      var hasDetail = WF.details && WF.details[it.id];
+      var pc = (it.provision || it.cycle)
+        ? '<span class="wf-pc">' + esc([it.provision, it.cycle].filter(Boolean).join(" · ")) + "</span>" : "";
       return '<div class="wf-fcard"><div><strong>' + esc(it.name) + "</strong>" +
         '<span class="pb-tag">' + (reg ? esc(reg) : "전국") + "</span>" +
         ' <span class="' + confCls + '" style="font-size:11px">' + esc(it.confidence) + "</span></div>" +
         '<div class="wf-fben">' + esc(ben) + "</div>" +
         '<div class="wf-fmeta">' + esc(it.agency || "") + "  " +
-        '<a href="' + esc(it.source_url) + '" target="_blank" rel="noopener">복지로 상세 ↗</a></div></div>';
+        '<a href="' + esc(it.source_url) + '" target="_blank" rel="noopener">복지로 상세 ↗</a>' +
+        (it.online ? '<span class="wf-online">🖥 온라인 신청 가능</span>' : "") + pc + "</div>" +
+        (hasDetail
+          ? '<button class="wf-dtoggle" data-servid="' + esc(it.id) + '">자세히 보기 ▾</button><div class="wf-detail"></div>'
+          : "") +
+        "</div>";
     }).join("") || '<div class="wf-empty">조건·검색어에 맞는 항목이 없습니다. 검색어를 지우거나 상황을 바꿔보세요.</div>';
     if (hits.length > CAP) {
       listBox.innerHTML += '<div class="wf-more">…외 ' + (hits.length - CAP).toLocaleString() +
@@ -397,6 +444,36 @@
   }
 
   function renderAll() { renderCuration(); renderFull(); }
+
+  /* ── 상세 펼침 빌더 (이슈 #2) — central_details.json 기반, 펼칠 때 1회 생성 ── */
+  var CLAMP = 300;
+  function clampText(txt) {
+    txt = String(txt == null ? "" : txt).trim();
+    if (txt.length <= CLAMP) return '<span class="wf-dtext">' + esc(txt) + "</span>";
+    return '<span class="wf-dtext">' + esc(txt.slice(0, CLAMP)) + '…</span>' +
+      '<span class="wf-dtext" style="display:none">' + esc(txt) + "</span> " +
+      '<button class="wf-morebtn">더보기</button>';
+  }
+  function buildDetail(d) {
+    var h = "";
+    [["지원대상", d.target], ["선정기준", d.criteria], ["서비스내용", d.content]].forEach(function (p) {
+      if (p[1] && String(p[1]).trim()) {
+        h += '<div class="wf-dfield"><b>' + p[0] + "</b><br>" + clampText(p[1]) + "</div>";
+      }
+    });
+    if (d.apply && d.apply.length) {
+      h += '<div class="wf-dfield"><b>신청방법</b><br><span class="wf-dtext">' + esc(d.apply.join(" · ")) + "</span></div>";
+    }
+    if (d.forms && d.forms.length) {
+      h += '<div class="wf-dfield"><b>신청서식</b><br>' + d.forms.map(function (f) {
+        return esc(f.name) + ' <a href="' + esc(f.link) + '" target="_blank" rel="noopener">내려받기 ↗</a>';
+      }).join("<br>") + "</div>";
+    }
+    if (d.contacts && d.contacts.length) {
+      h += '<div class="wf-dfield"><b>문의처</b><br><span class="wf-dtext">' + esc(d.contacts.join("\n")) + "</span></div>";
+    }
+    return h || '<div class="wf-dfield">표시할 상세 정보가 없습니다.</div>';
+  }
 
   /* ── 지역 select 동적 생성 (welfare_full.json의 region에서) ── */
   function buildSido() {
@@ -454,6 +531,18 @@
       renderCuration();
     } else if (btn.id === "wf-allon") {
       state.docsOff = new Set(); renderCuration();
+    } else if (btn.classList.contains("wf-dtoggle")) {
+      var panel = btn.nextElementSibling;
+      if (!panel || !panel.classList.contains("wf-detail")) return;
+      var det = WF.details && WF.details[btn.dataset.servid];
+      if (!panel.innerHTML && det) panel.innerHTML = buildDetail(det);
+      var open = panel.classList.toggle("wf-open");
+      btn.textContent = open ? "접기 ▴" : "자세히 보기 ▾";
+    } else if (btn.classList.contains("wf-morebtn")) {
+      var shortEl = btn.previousElementSibling && btn.previousElementSibling.previousElementSibling;
+      var fullEl = btn.previousElementSibling;
+      if (shortEl && fullEl) { shortEl.style.display = "none"; fullEl.style.display = ""; }
+      btn.style.display = "none";
     }
   });
   var qTimer = null;
@@ -486,7 +575,11 @@
     .then(function (j) { WELFARE = j; renderCuration(); });
   var pFull = fetch("data/welfare_full.json").then(function (r) { return r.json(); })
     .then(function (j) { FULL = j; buildSido(); buildGugun(); renderFull(); });
-  dataReady = Promise.all([pCur, pFull]).catch(function (err) {
+  // 중앙 상세 90건 — 실패해도 목록은 그대로 동작(토글만 안 나타남)
+  var pDet = fetch("data/central_details.json").then(function (r) { return r.json(); })
+    .then(function (j) { WF.details = j; if (FULL) renderFull(); })
+    .catch(function () { WF.details = {}; });
+  dataReady = Promise.all([pCur, pFull, pDet]).catch(function (err) {
     $("#wf-full-list").innerHTML = '<div class="wf-empty">데이터를 불러오지 못했어요 (' + esc(err.message) +
       "). GitHub Pages나 로컬 서버(http)로 열어주세요 — file:// 직접 열기는 지원되지 않습니다.</div>";
   });
