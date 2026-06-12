@@ -4,6 +4,16 @@
   data/welfare_full.json     services 테이블 전체 (스키마·키 순서 v2와 동일)
   data/central_details.json  중앙+지자체 상세 병합 {servId: {...}} (키는 servId라 충돌 없음)
   index.html                 var COLLECTED_AT = "YYYY-MM-DD" 상수 교체
+
+추가(자격/서류 — eligibility/req_documents 테이블에서 생성):
+  data/eligibility.json      { servId: {income, age, categories, exclusions,
+                               documents:[{std_name,kind,source}], doc_summary,
+                               eligibility_summary, confidence, notes} }
+  data/doc_index.json        { 표준서류명: {count, servIds:[상위200], kind} } 역색인
+
+사용:
+  python export_site.py          # 전체(welfare_full/central_details/index.html)
+  python export_site.py --elig   # eligibility.json + doc_index.json 만 (정본 무수정)
 """
 import json
 import re
@@ -43,8 +53,64 @@ def service_row_to_obj(row) -> dict:
     return {k: base[k] for k in keys}
 
 
+def export_eligibility(con) -> None:
+    """eligibility + req_documents -> data/eligibility.json, data/doc_index.json."""
+    # 서류를 servId별로 모아둠 (eligibility.json·doc_index.json 양쪽에서 사용)
+    docs_by_serv: dict[str, list] = {}
+    doc_index: dict[str, dict] = {}
+    for r in con.execute(
+            "SELECT serv_id, std_name, raw_name, kind, source FROM req_documents "
+            "ORDER BY rowid"):
+        docs_by_serv.setdefault(r["serv_id"], []).append(
+            {"std_name": r["std_name"], "kind": r["kind"], "source": r["source"]})
+        std = r["std_name"]
+        ent = doc_index.setdefault(std, {"count": 0, "servIds": [], "kind": r["kind"]})
+        ent["count"] += 1
+        if len(ent["servIds"]) < 200 and r["serv_id"] not in ent["servIds"]:
+            ent["servIds"].append(r["serv_id"])
+
+    elig: dict[str, dict] = {}
+    for r in con.execute("SELECT * FROM eligibility ORDER BY serv_id"):
+        sid = r["serv_id"]
+        elig[sid] = {
+            "income": {
+                "type": r["income_type"], "median_pct": r["income_pct"],
+                "bound": r["income_bound"], "raw": r["income_raw"],
+                "confidence": r["income_conf"],
+            },
+            "age": {
+                "min": r["age_min"], "max": r["age_max"], "unit": r["age_unit"],
+                "raw": r["age_raw"], "confidence": r["age_conf"],
+            },
+            "categories": json.loads(r["req_categories"]),
+            "exclusions": json.loads(r["exclusions"]),
+            "documents": docs_by_serv.get(sid, []),
+            "doc_summary": r["doc_summary"],
+            "eligibility_summary": r["eligibility_summary"],
+            "confidence": r["overall_conf"],
+            "notes": r["notes"],
+        }
+
+    (DATA / "eligibility.json").write_text(
+        json.dumps(elig, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"eligibility.json: {len(elig)}건")
+
+    # doc_index: count 내림차순 정렬해 출력(가독·디버그용)
+    doc_index_sorted = dict(
+        sorted(doc_index.items(), key=lambda kv: (-kv[1]["count"], kv[0])))
+    (DATA / "doc_index.json").write_text(
+        json.dumps(doc_index_sorted, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"doc_index.json: {len(doc_index_sorted)}개 표준서류")
+
+
 def main() -> None:
     con = db.connect()
+
+    # --elig: 정본(welfare_full/index.html)은 건드리지 않고 자격/서류만 export
+    if "--elig" in sys.argv:
+        export_eligibility(con)
+        con.close()
+        return
 
     # 1) welfare_full.json — 시드 시점의 원본 순서 보존을 위해 rowid 순으로 출력
     rows = con.execute("SELECT * FROM services ORDER BY rowid").fetchall()
@@ -76,6 +142,9 @@ def main() -> None:
             print(f"경고: COLLECTED_AT 상수 매칭 {n}건 — index.html 미변경")
         else:
             print(f"index.html COLLECTED_AT 이미 {collected_at}")
+
+    # 4) eligibility.json + doc_index.json
+    export_eligibility(con)
     con.close()
 
 

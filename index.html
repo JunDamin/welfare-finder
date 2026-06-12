@@ -94,6 +94,9 @@
 .wf-form:hover{border-color:var(--pb-navy2);background:var(--pb-tint)}
 .wf-doctag{display:inline-block;background:#fdf3e0;color:#8a5a12;font-size:12px;font-weight:600;
   border-radius:6px;padding:2px 8px;margin:0 5px 5px 0}
+.wf-excl{background:#fdecec;border:1px solid #f3c5c5;border-radius:8px;padding:9px 12px;font-size:13px;color:var(--pb-ink);margin-bottom:10px}
+.wf-eligbox{background:var(--pb-tint);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:10px}
+.wf-eligbox b{color:var(--pb-navy)}
 .wf-morebtn{background:none;border:none;color:var(--pb-navy);font-size:12px;font-weight:700;
   cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
 .wf-foot{font-size:12px;color:var(--pb-muted);margin-top:24px;line-height:1.8}
@@ -470,28 +473,54 @@
     while ((m = re.exec(blob)) !== null) { var s = m[1].replace(/\s/g, ""); if (!seen[s]) { seen[s] = 1; out.push(s); } }
     return out.slice(0, 8);
   }
-  function buildDetail(d) {
+  function buildDetail(d, sid) {
     var h = "";
-    // ★ 준비 안내를 맨 위에 — 사람이 '무엇을 받아 어떻게 내는지' 먼저 보게
+    var e = (WF.elig && sid) ? WF.elig[sid] : null;   // 정형화 자격·서류
+    // ★ 준비 안내를 맨 위에
     var prep = "";
     if (d.apply && d.apply.length) {
       prep += d.apply.map(function (a) { return '<span class="wf-mbadge">' + esc(a) + " 신청</span>"; }).join(" ");
     }
-    var docs = extractDocs(d);
-    if (prep || (d.forms && d.forms.length) || docs.length) {
+    // 정형화된 구비서류 — 참고자료(계획·지침·안내·운영)는 '서류'에서 제외(잘못 준비 방지)
+    var NOISE = /(사업\s*)?(안내|지침|계획|운영|총괄|추진|개요|연혁|편람|매뉴얼)/;
+    var stdDocs = (e && e.documents) ? e.documents.filter(function (x) { return x.std_name && !NOISE.test(x.std_name); }) : null;
+    if (stdDocs && !stdDocs.length) stdDocs = null;
+    if (prep || (d.forms && d.forms.length) || stdDocs) {
       h += '<div class="wf-prep"><div class="wf-preptit">📎 준비 안내</div>';
       if (prep) h += '<div style="margin-bottom:8px">' + prep + "</div>";
+      if (stdDocs) {
+        h += '<div style="font-size:12px;color:var(--pb-muted);margin-bottom:4px">구비서류 — 이 복지에 필요한 서류예요</div>';
+        h += stdDocs.map(function (x) {
+          var src = x.source === "양식파일" ? "양식" : (x.source === "양식+본문" ? "양식·본문" : "안내문");
+          return '<span class="wf-doctag" title="' + esc(x.kind || "") + ' · ' + esc(src) + '">' + esc(x.std_name) + "</span>";
+        }).join("");
+      }
       if (d.forms && d.forms.length) {
-        h += '<div style="font-size:12px;color:var(--pb-muted);margin-bottom:3px">신청 서식 — 내려받아 작성하세요</div>';
+        h += '<div style="font-size:12px;color:var(--pb-muted);margin:8px 0 3px">신청 서식 — 내려받아 작성하세요</div>';
         h += d.forms.map(function (f) {
           return '<a class="wf-form" href="' + esc(f.link) + '" target="_blank" rel="noopener">📄 ' + esc(f.name) + " ↓</a>";
         }).join("");
       }
-      if (docs.length) {
-        h += '<div style="font-size:12px;color:var(--pb-muted);margin:8px 0 3px">본문에 언급된 서류(참고 — 정확한 구비서류는 위 서식·문의처 확인)</div>';
-        h += docs.map(function (x) { return '<span class="wf-doctag">' + esc(x) + "</span>"; }).join("");
-      }
+      h += '<div style="font-size:11px;color:var(--pb-muted);margin-top:8px">정확한 구비서류·자격은 신청서식·복지로 상세에서 최종 확인하세요.</div>';
       h += "</div>";
+    }
+    // ⚠️ 동시수급 배제
+    if (e && e.exclusions && e.exclusions.length) {
+      h += '<div class="wf-excl">⚠️ <b>이런 경우 함께 받기 어려워요:</b> ' +
+        e.exclusions.map(function (x) { return esc(x.what); }).join(" / ") + "</div>";
+    }
+    // 정형 자격 요약
+    if (e) {
+      var bits = [];
+      if (e.income && e.income.type && e.income.type !== "명시안됨") {
+        bits.push(e.income.median_pct != null ? ("소득 중위 " + e.income.median_pct + "% " + (e.income.bound || "")) : ("소득: " + e.income.type));
+      }
+      if (e.age && (e.age.min != null || e.age.max != null)) {
+        bits.push("연령 " + (e.age.min != null ? e.age.min : "") + "~" + (e.age.max != null ? e.age.max : "") + (e.age.unit || ""));
+      }
+      if (e.categories && e.categories.length) bits.push("대상: " + e.categories.map(function (c) { return c.cat; }).slice(0, 4).join(", "));
+      if (bits.length) h += '<div class="wf-eligbox"><b>자격 한눈에</b> · ' + bits.map(esc).join(" · ") +
+        (e.confidence === "low" ? ' <span class="wf-doctag">확인 필요</span>' : "") + "</div>";
     }
     [["지원대상", d.target], ["선정기준", d.criteria], ["서비스내용", d.content]].forEach(function (p) {
       if (p[1] && String(p[1]).trim()) {
@@ -563,8 +592,9 @@
     } else if (btn.classList.contains("wf-dtoggle")) {
       var panel = btn.nextElementSibling;
       if (!panel || !panel.classList.contains("wf-detail")) return;
-      var det = WF.details && WF.details[btn.dataset.servid];
-      if (!panel.innerHTML && det) panel.innerHTML = buildDetail(det);
+      var sid = btn.dataset.servid;
+      var det = WF.details && WF.details[sid];
+      if (!panel.innerHTML && det) panel.innerHTML = buildDetail(det, sid);
       var open = panel.classList.toggle("wf-open");
       btn.textContent = open ? "접기 ▴" : "자세히 보기 ▾";
     } else if (btn.classList.contains("wf-morebtn")) {
@@ -604,11 +634,15 @@
     .then(function (j) { WELFARE = j; renderCuration(); });
   var pFull = fetch("data/welfare_full.json").then(function (r) { return r.json(); })
     .then(function (j) { FULL = j; buildSido(); buildGugun(); renderFull(); });
-  // 중앙 상세 90건 — 실패해도 목록은 그대로 동작(토글만 안 나타남)
+  // 상세 1,079건 — 실패해도 목록은 그대로 동작(토글만 안 나타남)
   var pDet = fetch("data/central_details.json").then(function (r) { return r.json(); })
     .then(function (j) { WF.details = j; if (FULL) renderFull(); })
     .catch(function () { WF.details = {}; });
-  dataReady = Promise.all([pCur, pFull, pDet]).catch(function (err) {
+  // 정형화 자격·서류 1,079건 (LLM 추출 → 표준화)
+  var pElig = fetch("data/eligibility.json").then(function (r) { return r.json(); })
+    .then(function (j) { WF.elig = j; if (FULL) renderFull(); })
+    .catch(function () { WF.elig = {}; });
+  dataReady = Promise.all([pCur, pFull, pDet, pElig]).catch(function (err) {
     $("#wf-full-list").innerHTML = '<div class="wf-empty">데이터를 불러오지 못했어요 (' + esc(err.message) +
       "). GitHub Pages나 로컬 서버(http)로 열어주세요 — file:// 직접 열기는 지원되지 않습니다.</div>";
   });
