@@ -101,6 +101,40 @@
   cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
 .wf-foot{font-size:12px;color:var(--pb-muted);margin-top:24px;line-height:1.8}
 @media(max-width:480px){.pb-mets{flex-direction:column;gap:8px}}
+/* ── 그룹 헤더 (✅/🔍) ── */
+.wf-ghead{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;margin:0 0 4px;cursor:pointer}
+.wf-ghead .wf-gn{background:var(--pb-navy);color:#fff;font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px}
+.wf-ghead-ok{color:var(--pb-ok)} .wf-ghead-ok .wf-gn{background:var(--pb-ok)}
+.wf-ghead-check{color:var(--pb-warn)} .wf-ghead-check .wf-gn{background:var(--pb-warn)}
+.wf-gsub{font-size:13px;color:var(--pb-muted);margin:0 0 10px}
+.wf-gcoll .wf-glist{display:none}
+.wf-gtoggle{font-size:12px;color:var(--pb-muted);margin-left:auto;font-weight:700}
+/* ── 통합 카드 (✅/🔍 공용) ── */
+.wf-card{background:var(--pb-bg);border:1px solid var(--pb-line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+.wf-card.wf-paired{border-color:var(--pb-navy2);background:#f8fbff}
+.wf-card.wf-pdim{opacity:.5;filter:grayscale(.6)}
+.wf-card h3{font-size:15px;font-weight:800;margin:0 0 4px;color:var(--pb-navy)}
+.wf-card .wf-cben{font-size:13px;color:var(--pb-muted);margin-bottom:6px;line-height:1.6}
+.wf-card .wf-cmeta{font-size:12px;color:var(--pb-muted);line-height:1.7}
+.wf-vbadge{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px}
+.wf-vb-cur{background:#e9f6ec;color:var(--pb-ok)} .wf-vb-full{background:var(--pb-tint);color:var(--pb-muted);border:1px solid var(--pb-line)}
+.wf-vb-low{background:#fdf3e0;color:#8a5a12}
+.wf-pairbox{background:#eef5ff;border:1px solid #cfe0f5;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.wf-pairbox .wf-pl{font-size:12px;font-weight:700;color:var(--pb-navy);margin-bottom:6px}
+.wf-pairbox label{display:inline-flex;align-items:center;gap:6px;margin-right:16px;font-size:13px;cursor:pointer}
+.wf-pairnote{font-size:12px;color:var(--pb-muted);margin-top:4px}
+/* ── 통합 준비물(2층) ── */
+.wf-prep2{background:#e9f6ec;border-radius:10px;padding:14px 16px;margin:10px 0}
+.wf-prep2.wf-opt{background:var(--pb-tint)}
+.wf-prep2 .wf-pt{font-size:14px;font-weight:800;margin-bottom:8px}
+.wf-prep2 ul{list-style:none;padding:0;margin:0}
+.wf-prep2 li{padding:6px 2px;font-size:13px;border-bottom:1px dashed var(--pb-line)}
+.wf-prep2 li:last-child{border-bottom:none}
+.wf-optdoc{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;
+  cursor:pointer;padding:0;font-size:13px;font-family:inherit;color:var(--pb-ink)}
+.wf-optdoc .ck{flex:none;width:18px;height:18px;border-radius:5px;border:2px solid var(--pb-line);position:relative}
+.wf-optdoc.on .ck{background:var(--pb-navy);border-color:var(--pb-navy)}
+.wf-optdoc.on .ck::after{content:"✓";position:absolute;top:-3px;left:2px;color:#fff;font-size:13px;font-weight:800}
 </style>
 </head>
 <body>
@@ -153,16 +187,19 @@
     </div>
   </div>
 
-  <!-- ② 결과 -->
+  <!-- ② 결과: 단일 동선 — 받을 수 있는 복지(✅/🔍 그룹) → 통합 준비물 -->
   <div id="wf-results">
-    <div class="pb-card" id="wf-cur-card"></div>
+    <!-- ②-1 받을 수 있는 복지(완전 열거) -->
     <div class="pb-card">
-      <div id="wf-full-head"></div>
+      <div id="wf-groups-head"></div>
       <input class="pb-i" id="wf-q" placeholder="결과 안에서 검색 (예: 의료비, 교육, 주거)" style="margin-top:6px">
-      <div id="wf-full-list" style="margin-top:10px"><div class="wf-empty">복지로 전체 데이터(5,012건, 3.3MB)를 불러오는 중…</div></div>
-      <div class="pb-next" style="margin-top:12px">이 목록은 복지로 공개 데이터의 거울입니다 — 본 도구는 자격을 판정하지 않으며,
-        최종 확인은 각 항목의 복지로 상세 페이지에서 하세요.</div>
+      <div id="wf-ok-wrap" style="margin-top:14px"></div>
+      <div id="wf-check-wrap" style="margin-top:14px"></div>
+      <div class="pb-next" style="margin-top:12px">이 목록은 <strong>완전 열거</strong>입니다 — 추천이 아니라, 조건에 맞는 복지를 빠짐없이 펼칩니다.
+        본 도구는 자격을 판정하지 않으며 최종 확인은 각 항목의 복지로/공식 페이지에서 하세요.</div>
     </div>
+    <!-- ②-2 통합 준비물(서류 합산) -->
+    <div class="pb-card" id="wf-prep-card"></div>
   </div>
 
   <div class="wf-foot">
@@ -174,82 +211,214 @@
 
 <script id="wf-logic">
 /* WF-LOGIC-START
-   순수 로직 — playbook-dryrun-welfare-fasthtml/app.py의 collect/match_full/bulk_documents/ready_check를
-   동일 규칙으로 JS 이식. DOM 의존 없음(node로 테스트 가능). */
+   순수 로직 — DOM 의존 없음(node로 테스트 가능, window.WF에 노출).
+   핵심 정체성: 추천이 아니라 '완전 열거' — 조건에 맞는 복지는 빠짐없이 제시(놓침 0).
+   매칭 전부(큐레이션 15 + 정형/목록 5,012)를 확신도 3구간(✅받을수있어요 / 🔍확인필요 / ❌숨김)으로 분류.
+   숨김(❌)은 명시적 숫자 위배 100%일 때만 — 모호하면 절대 안 숨김. */
 (function (g) {
   "use strict";
 
   function toSet(x) { return x instanceof Set ? x : new Set(x || []); }
 
-  /* 켜진 상황 태그에 해당하는 큐레이션 지원을 '전부' 수집(검색 아님).
-     region: 거주지. 전국 항목(region 없음)은 항상, 지역 항목은 계층 prefix 일치 시만. */
-  function collect(welfare, activeTags, careType, incomePct, region) {
-    var act = toSet(activeTags), out = [];
-    for (var i = 0; i < welfare.length; i++) {
-      var w = welfare[i];
-      if (!w.tags.some(function (t) { return act.has(t); })) continue;
-      var r = w.region;                       // 전국=undefined=항상
-      if (r && !(region && (region === r || region.indexOf(r + " ") === 0))) continue;
-      var ct = w.care_type;                   // 택1 분기(가정양육↔보육료)
-      if (ct && ct !== careType) continue;
-      if (w.income_max && incomePct && incomePct > w.income_max) continue;
-      out.push(w);
-    }
-    var seen = new Set(), uniq = [];          // 태그가 겹쳐도 1번만
-    out.forEach(function (w) {
-      if (seen.has(w.name)) return;
-      seen.add(w.name); uniq.push(w);
-    });
-    return uniq;
-  }
-
-  /* 복지로 전체(5,012건): 공식 분류 태그 ∩ 켜진 상황 + 지역 prefix + 키워드 검색.
-     지자체 항목은 거주지가 맞을 때만, 전국(중앙) 먼저 정렬. */
-  function matchFull(full, activeTags, loc, q) {
-    var act = toSet(activeTags);
-    var qq = (q || "").trim().toLowerCase();
+  /* 큐레이션(welfare.json)·전체(welfare_full.json)를 하나의 후보 형태로 정규화.
+     - servId: 전체는 it.id, 큐레이션은 "CUR:<name>"(택1 쌍·중복제거 키)
+     - verified: 큐레이션(⭐사람검증)=true
+     - elig: eligibility.json[servId] (없으면 null) */
+  function normalize(welfare, full) {
     var out = [];
-    for (var i = 0; i < full.length; i++) {
-      var it = full[i];
-      if (act.size && !it.tags.some(function (t) { return act.has(t); })) continue;
-      var reg = it.region || "";
-      if (reg && !(loc && (loc === reg || loc.indexOf(reg + " ") === 0 || reg.indexOf(loc) === 0))) continue;
-      if (qq) {
-        var hay = (it.name + " " + (it.benefit || "") + " " + (it.agency || "")).toLowerCase();
-        if (hay.indexOf(qq) === -1) continue;
-      }
-      out.push(it);
-    }
-    out.sort(function (a, b) {
-      var ra = a.region ? 1 : 0, rb = b.region ? 1 : 0;   // 전국(중앙) 먼저
-      if (ra !== rb) return ra - rb;
-      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    var curUrlId = {}; // 큐레이션 → 매핑되는 전체 servId(중복 제거용)
+    (welfare || []).forEach(function (w) {
+      var m = (w.source_url || "").match(/wlfareInfoId=(WLF\d+)/);
+      var fid = m ? m[1] : null;
+      if (fid) curUrlId[fid] = 1;
+      out.push({
+        servId: "CUR:" + w.name, fullId: fid, name: w.name, source: "curation",
+        verified: true, tags: w.tags || [], region: w.region || null,
+        care_type: w.care_type || null, income_max: w.income_max || null,
+        benefit: w.benefit, how_to_apply: w.how_to_apply, deadline: w.deadline,
+        source_url: w.source_url, confidence: w.confidence,
+        curDocs: w.documents || []
+      });
+    });
+    (full || []).forEach(function (it) {
+      if (curUrlId[it.id]) return; // 큐레이션이 대표하므로 전체 쪽 중복 제외
+      out.push({
+        servId: it.id, fullId: it.id, name: it.name, source: "full",
+        verified: false, tags: it.tags || [], region: it.region || null,
+        care_type: null, income_max: null,
+        benefit: it.benefit, agency: it.agency, source_url: it.source_url,
+        confidence: it.confidence, online: it.online, cycle: it.cycle, provision: it.provision
+      });
     });
     return out;
   }
 
-  /* 수집한 지원 전체의 서류를 합쳐 중복 제거 → [서류, 사용 항목들] 빈도순. */
-  function bulkDocs(candidates) {
-    var usage = new Map();
-    candidates.forEach(function (c) {
-      c.documents.forEach(function (d) {
-        if (!usage.has(d)) usage.set(d, []);
-        usage.get(d).push(c.name);
+  /* 사용자 소득 선택값(50/100/150/999=초과)의 '확실한 최소 소득 하한(%)'.
+     '이하' 구간은 실제 소득을 모르므로 하한이 없다(=knockout 불가). 999만 하한 150 초과. */
+  function incomeFloor(incomePct) {
+    if (incomePct === 999) return 150; // 중위 150% '초과' → 최소 하한 150 초과
+    return null;                       // 그 외 '이하' 구간은 하한 없음
+  }
+
+  /* 명시적 소득 knockout: elig.income.median_pct 있고 confidence=high인데
+     사용자 소득 하한이 그 상한을 명백히 초과할 때만 true(=숨김 사유). */
+  function incomeKnockout(elig, incomePct) {
+    if (!elig || !elig.income) return false;
+    var cap = elig.income.median_pct;
+    if (cap == null) return false;
+    if (elig.income.confidence !== "high") return false;
+    var floor = incomeFloor(incomePct);
+    if (floor == null) return false;
+    return floor >= cap; // 사용자 최소 소득 ≥ 지원 상한 → 명백 초과
+  }
+
+  /* 소득 단서가 '없음이 확실'한가(✅ 조건). median_pct 없거나, 사용자가 안 걸리거나, confidence=high. */
+  function incomeClearOk(elig, incomePct) {
+    if (!elig || !elig.income) return true;       // 정형 자격 없음 → 큐레이션이 따로 판단
+    var cap = elig.income.median_pct;
+    if (cap == null) return true;                 // 소득 무관/미명시
+    if (incomePct == null) return false;          // 사용자가 소득을 안 줌 → 애매(🔍)
+    var floor = incomeFloor(incomePct);
+    // '이하' 구간: 사용자 상한이 지원 상한 이하이고 confidence=high면 확실히 충족
+    if (incomePct !== 999 && incomePct <= cap && elig.income.confidence === "high") return true;
+    return false;
+  }
+
+  /* 큐레이션 income_max(상한, %)와 사용자 소득. 명백 초과만 knockout. */
+  function curIncomeKnockout(c, incomePct) {
+    if (!c.income_max) return false;
+    var floor = incomeFloor(incomePct);
+    if (floor == null) return false;
+    return floor >= c.income_max;
+  }
+
+  /* 택1(동시수급) 쌍: 사용자가 고르지 않은 쪽을 ✅에서 '제외 후보'로 표시.
+     pairs: [{a, b, ...}] servId 또는 CUR:name. 선택값 selected(servId)로 분기. */
+  function pairExcluded(servId, pairs, selected) {
+    for (var i = 0; i < (pairs || []).length; i++) {
+      var p = pairs[i];
+      if (p.a === servId || p.b === servId) {
+        var other = p.a === servId ? p.b : p.a;
+        var chosen = selected[p.a + "|" + p.b];
+        // 기본 선택은 a. chosen이 이 servId가 아니면 제외(회색)
+        var pick = chosen || p.a;
+        if (pick !== servId) return { excludedBy: other, pair: p };
+      }
+    }
+    return null;
+  }
+
+  /* 3구간 판정(비대칭) — 양끝 보수적, 가운데 너그럽게.
+     반환: {group:"ok"|"check"|"hidden", reasons:[...]} */
+  function judge(c, ctx) {
+    // ctx: { activeTags(Set), incomePct, careType, pairs, pairSelected }
+    var act = toSet(ctx.activeTags);
+    var elig = c.elig || null;
+
+    // 보육 형태(택1) — 큐레이션 care_type가 사용자 선택과 다르면 ❌(명시적 분기, 100% 위배)
+    if (c.care_type && c.care_type !== ctx.careType) {
+      return { group: "hidden", reasons: ["보육형태 불일치(" + c.care_type + ")"] };
+    }
+
+    // 태그 매칭(상황칩) — 켠 칩이 있는데 하나도 안 겹치면 후보 아님
+    var tagHit = c.tags.some(function (t) { return act.has(t); });
+    if (act.size && !tagHit) return { group: null, reasons: ["상황 미매칭"] }; // 후보에서 제외
+
+    // ❌ 명시적 소득 knockout(100% 위배만)
+    if (incomeKnockout(elig, ctx.incomePct) || curIncomeKnockout(c, ctx.incomePct)) {
+      return { group: "hidden", reasons: ["소득 상한 명백 초과(확정)"] };
+    }
+
+    // ✅ 받을 수 있어요: 명확 매칭 + 소득충돌 없음이 확실 + (연령 단서가 high면 충돌 없음)
+    var reasons = [];
+    var incomeOk = c.verified ? !curIncomeKnockout(c, ctx.incomePct) && (c.income_max == null || ctx.incomePct == null || ctx.incomePct !== 999)
+                              : incomeClearOk(elig, ctx.incomePct);
+    var ageOk = true; // 연령은 정밀 입력이 없어 knockout 안 함(표시만) — 놓침 0 원칙
+    if (c.verified && tagHit) {
+      // 큐레이션은 사람이 검증 — 태그 매칭되면 소득 명백초과만 아니면 ✅
+      if (incomeOk) { reasons.push("⭐검증 큐레이션 · 상황 매칭"); return { group: "ok", reasons: reasons }; }
+      return { group: "check", reasons: ["⭐검증이나 소득 단서 확인 필요"] };
+    }
+    if (tagHit && incomeOk && elig && elig.confidence === "high") {
+      reasons.push("정형 자격 고신뢰 · 상황 매칭 · 소득 충돌 없음");
+      return { group: "ok", reasons: reasons };
+    }
+    // 🔍 그 외(매칭됐으나 애매·부분충족·저신뢰·소득단서 불명확) — 너그럽게 전부 여기
+    return { group: "check", reasons: ["매칭됨 · 자격/소득 단서 확인 필요"] };
+  }
+
+  /* 후보 전체를 3구간으로 분류(매칭 안 되는 건 제외). 신뢰순 정렬(검증>고신뢰>그외, 전국 먼저). */
+  function judge3group(cands, ctx) {
+    var ok = [], check = [], hidden = [];
+    (cands || []).forEach(function (c) {
+      var v = judge(c, ctx);
+      c._judge = v;
+      if (v.group === "ok") ok.push(c);
+      else if (v.group === "check") check.push(c);
+      else if (v.group === "hidden") hidden.push(c);
+      // group === null → 후보 아님(미매칭)
+    });
+    var rank = function (c) { return c.verified ? 0 : (c.elig && c.elig.confidence === "high" ? 1 : 2); };
+    var sorter = function (a, b) {
+      var ra = rank(a), rb = rank(b); if (ra !== rb) return ra - rb;
+      var ga = a.region ? 1 : 0, gb = b.region ? 1 : 0; if (ga !== gb) return ga - gb;
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    };
+    ok.sort(sorter); check.sort(sorter); hidden.sort(sorter);
+    return { ok: ok, check: check, hidden: hidden };
+  }
+
+  /* 후보의 '표준 서류' 목록 추출. 큐레이션은 curDocs(검증), 정형은 elig.documents.
+     참고자료(계획·지침·안내문 등)는 서류에서 제외(잘못 준비 방지). */
+  var DOC_NOISE = /(사업\s*)?(안내|지침|계획|운영|총괄|추진|개요|연혁|편람|매뉴얼)/;
+  function candDocs(c) {
+    if (c.verified && c.curDocs) {
+      return c.curDocs.map(function (n) { return { name: n, confidence: "high", verified: true }; });
+    }
+    if (c.elig && c.elig.documents) {
+      return c.elig.documents
+        .filter(function (x) { return x.std_name && !DOC_NOISE.test(x.std_name); })
+        .map(function (x) {
+          // 정형 서류 신뢰: 양식파일/양식+본문 = high, 본문언급 = 그 외
+          var hi = x.source === "양식파일" || x.source === "양식+본문";
+          return { name: x.std_name, confidence: hi ? "high" : "medium", verified: false, kind: x.kind, src: x.source };
+        });
+    }
+    return [];
+  }
+
+  /* ✅ 그룹(택1 선택 반영)의 서류 합산을 2층으로:
+     - confirmed: ⭐검증 서류 + 정형 confidence=high 서류만 (중복제거, 사용처 빈도순)
+     - optional: 나머지 정형(확신 낮음) 서류 (체크 시 합산에 추가)
+     반환 항목: {name, uses:[names], confirmed:bool} */
+  function mergeBulk(okCands, ctx) {
+    var pairs = ctx.pairs, sel = ctx.pairSelected || {};
+    var confirmed = new Map(), optional = new Map();
+    okCands.forEach(function (c) {
+      // 택1에서 선택 안 된 쪽은 서류 합산 제외
+      if (pairExcluded(c.servId, pairs, sel)) return;
+      candDocs(c).forEach(function (d) {
+        var bucket = d.confidence === "high" ? confirmed : optional;
+        if (!bucket.has(d.name)) bucket.set(d.name, []);
+        bucket.get(d.name).push(c.name);
       });
     });
-    return Array.from(usage.entries()).sort(function (a, b) {
-      if (b[1].length !== a[1].length) return b[1].length - a[1].length;
-      return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;
-    });
+    // optional에서 이미 confirmed에 있는 서류는 제거(중복 방지)
+    confirmed.forEach(function (_v, k) { optional.delete(k); });
+    var toArr = function (m, conf) {
+      return Array.from(m.entries()).sort(function (a, b) {
+        if (b[1].length !== a[1].length) return b[1].length - a[1].length;
+        return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;
+      }).map(function (kv) { return { name: kv[0], uses: kv[1], confirmed: conf }; });
+    };
+    return { confirmed: toArr(confirmed, true), optional: toArr(optional, false) };
   }
 
-  /* 켜진 서류만으로 신청 가능한가 — 꺼진 필수 서류 목록 반환(빈 배열=신청 가능). */
-  function readyCheck(c, off) {
-    var offSet = toSet(off);
-    return c.documents.filter(function (d) { return offSet.has(d); });
-  }
-
-  g.WF = { collect: collect, matchFull: matchFull, bulkDocs: bulkDocs, readyCheck: readyCheck };
+  g.WF = {
+    normalize: normalize, judge: judge, judge3group: judge3group,
+    candDocs: candDocs, mergeBulk: mergeBulk, pairExcluded: pairExcluded,
+    incomeKnockout: incomeKnockout, incomeClearOk: incomeClearOk
+  };
 })(typeof window !== "undefined" ? window : globalThis);
 /* WF-LOGIC-END */
 </script>
@@ -278,8 +447,11 @@
     { id: "mid",    label: "🧓 중장년",                 tags: ["중장년"] }
   ];
   var state = { on: new Set(), ages: new Set(["영아", "영유아"]), care: "home",
-                income: null, sido: "", gugun: "", docsOff: new Set(), q: "" };
+                income: null, sido: "", gugun: "", q: "",
+                pairSelected: {}, okPage: 1, checkPage: 1,
+                okColl: false, checkColl: false, optOn: new Set() };
   var WELFARE = null, FULL = null;
+  var PAIRS = [], CANDS = null, LAST_OK = [], LAST_HIDDEN = [];
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (m) {
@@ -312,149 +484,242 @@
     $("#wf-drill").style.display = state.on.has("child") ? "block" : "none";
   }
 
-  /* ── ⭐ 검증 큐레이션 섹션 ── */
-  function renderCuration() {
-    var box = $("#wf-cur-card");
-    if (!WELFARE) { box.innerHTML = '<div class="wf-empty">큐레이션 데이터 로딩 중…</div>'; return; }
-    var act = activeTags(), loc = currentLoc();
-    var head = '<div class="pb-step"><div class="pb-stepnum">★</div><div>' +
-      '<h2 style="font-size:18px;font-weight:800;margin:2px 0">검증 큐레이션' +
-      '<span class="wf-trust wf-trust-cur">⭐ 사람이 공식 출처 확인 · 15건 중 매칭</span></h2>';
-    if (act.size === 0) {
-      box.innerHTML = head + '<div class="pb-sub">위에서 상황을 켜면 여기에 맞춤 지원과 통합 준비물이 나타납니다.</div></div></div>' +
-        '<div class="wf-empty">아직 켠 상황이 없어요. 칩을 켜거나, 맨 위의 <strong>예시 버튼</strong>을 눌러보세요.</div>';
-      return;
-    }
-    var cands = WF.collect(WELFARE, act, state.care, state.income, loc);
-    if (!cands.length) {
-      box.innerHTML = head + '<div class="pb-sub">조건에 맞는 큐레이션 항목이 없습니다.</div></div></div>' +
-        '<div class="wf-empty">켜진 상황에 맞는 검증 항목을 못 찾았어요. 다른 상황을 켜거나 소득을 ‘모름’으로 바꿔보세요. ' +
-        '아래 🔄 복지로 전체에는 더 있을 수 있습니다.</div>';
-      return;
-    }
-    var bulk = WF.bulkDocs(cands);
-    var bulkNames = new Set(bulk.map(function (kv) { return kv[0]; }));
-    // 후보가 바뀌면 무관해진 서류는 자동 정리 (app.py와 동일)
-    state.docsOff = new Set(Array.from(state.docsOff).filter(function (d) { return bulkNames.has(d); }));
-    var off = state.docsOff;
-    var ready = cands.filter(function (c) { return WF.readyCheck(c, off).length === 0; });
-    var dimmed = cands.filter(function (c) { return WF.readyCheck(c, off).length > 0; });
-    var common = bulk.filter(function (kv) { return kv[1].length > 1; });
-    var nOn = bulk.length - off.size;
-    var dual = state.on.has("dual");
+  /* ── 정규화된 후보 캐시 + 검색 필터 ── */
+  function allCandidates() {
+    if (CANDS) return CANDS;
+    if (!WELFARE && !FULL) return [];
+    CANDS = WF.normalize(WELFARE || [], FULL || []);
+    if (WF.elig) CANDS.forEach(function (c) { c.elig = WF.elig[c.fullId] || null; });
+    return CANDS;
+  }
+  function applyFilters(cands) {
+    var loc = currentLoc(), qq = (state.q || "").trim().toLowerCase();
+    return cands.filter(function (c) {
+      // 지역: 전국 항상, 지역 항목은 거주지 prefix 일치 시만
+      var reg = c.region || "";
+      if (reg && !(loc && (loc === reg || loc.indexOf(reg + " ") === 0 || reg.indexOf(loc) === 0))) return false;
+      if (qq) {
+        var hay = (c.name + " " + (c.benefit || "") + " " + (c.agency || "")).toLowerCase();
+        if (hay.indexOf(qq) === -1) return false;
+      }
+      return true;
+    });
+  }
+  function judgeCtx() {
+    return {
+      activeTags: activeTags(), incomePct: state.income, careType: state.care,
+      pairs: PAIRS, pairSelected: state.pairSelected
+    };
+  }
 
-    var h = head +
-      '<div class="pb-sub">서류 <strong>' + bulk.length + "종</strong>만 준비하면 <strong>" + cands.length +
-      "개</strong> 지원을 신청할 수 있어요. 준비 안 할 서류는 꺼보세요 — 그 서류가 필요한 지원은 불이 꺼집니다.</div></div></div>";
+  /* 카드 1장(✅/🔍 공용). paired: 택1 쌍이면 라디오·회색 처리 정보. */
+  function candCard(c, opts) {
+    opts = opts || {};
+    var dim = opts.dim;
+    var vb = c.verified ? '<span class="wf-vbadge wf-vb-cur">⭐ 검증</span>'
+           : (c.elig && c.elig.confidence === "low") ? '<span class="wf-vbadge wf-vb-low">📋 정형 · 확인 필요</span>'
+           : '<span class="wf-vbadge wf-vb-full">📋 정형</span>';
+    var dual = state.on.has("dual") && c.name.indexOf("아이돌봄") !== -1
+      ? '<span class="pb-dualb">🟢 맞벌이 우선</span>' : "";
+    var reg = c.region ? '<span class="pb-tag">' + esc(c.region) + "</span>" : "";
+    var ben = c.benefit || ""; if (ben.length > 140) ben = ben.slice(0, 140) + "…";
+    // 자격 한눈에
+    var elig = c.elig, bits = [];
+    if (elig) {
+      if (elig.income && elig.income.median_pct != null)
+        bits.push("소득 중위 " + elig.income.median_pct + "% " + (elig.income.bound || ""));
+      if (elig.age && (elig.age.min != null || elig.age.max != null))
+        bits.push("연령 " + (elig.age.min != null ? elig.age.min : "") + "~" + (elig.age.max != null ? elig.age.max : "") + (elig.age.unit || ""));
+    }
+    var eligBox = bits.length ? '<div class="wf-eligbox"><b>자격 한눈에</b> · ' + bits.map(esc).join(" · ") + "</div>" : "";
+    // 애매한 동시수급 경고(택1로 안 묶인 exclusions)
+    var exclWarn = "";
+    if (elig && elig.exclusions && elig.exclusions.length) {
+      exclWarn = '<div class="wf-excl">⚠️ ' + esc(elig.exclusions.slice(0, 3).map(function (x) { return x.what; }).join(" / ")) +
+        " — 중복될 수 있어요, 신청처 확인</div>";
+    }
+    var hasDetail = WF.details && WF.details[c.fullId];
+    var srcUrl = c.source_url || "#";
+    var docsLine = c.verified && c.curDocs ? ("서류: " + esc(c.curDocs.join(", ")) + "<br>") : "";
+    return '<div class="wf-card' + (opts.paired ? " wf-paired" : "") + (dim ? " wf-pdim" : "") + '">' +
+      "<h3>" + esc(c.name) + vb + dual + reg + "</h3>" +
+      (ben ? '<div class="wf-cben">' + esc(ben) + "</div>" : "") +
+      eligBox + exclWarn +
+      '<div class="wf-cmeta">' + docsLine +
+      (c.agency ? esc(c.agency) + "  " : "") +
+      '<a href="' + esc(srcUrl) + '" target="_blank" rel="noopener">공식 페이지 ↗</a>' +
+      (c.online ? '<span class="wf-online">🖥 온라인 신청</span>' : "") + "</div>" +
+      (hasDetail ? '<button class="wf-dtoggle" data-servid="' + esc(c.fullId) + '">자세히 보기 ▾</button><div class="wf-detail"></div>' : "") +
+      "</div>";
+  }
+
+  /* 택1 쌍을 ✅ 안에서 인접 배치 + 라디오. okList 안의 쌍을 찾아 그룹 렌더. */
+  function renderPairBox(p, aCand, bCand) {
+    var key = p.a + "|" + p.b;
+    var pick = state.pairSelected[key] || p.a;
+    var radios = [["a", p.a, aCand], ["b", p.b, bCand]].map(function (x) {
+      var sid = x[1], cand = x[2];
+      var nm = cand ? cand.name : sid;
+      return '<label><input type="radio" name="pair-' + esc(key) + '" data-pairkey="' + esc(key) +
+        '" data-pairval="' + esc(sid) + '"' + (pick === sid ? " checked" : "") + "> " + esc(nm) + "</label>";
+    }).join("");
+    var h = '<div class="wf-pairbox"><div class="wf-pl">🔀 택1 (동시수급 불가) — ' + esc(p.label) + "</div>" + radios +
+      '<div class="wf-pairnote">' + esc(p.note || "둘 중 하나만 선택됩니다.") + " 선택한 쪽만 통합 준비물에 합산돼요.</div></div>";
+    // 두 카드(선택 안 된 쪽 회색)
+    [["a", p.a, aCand], ["b", p.b, bCand]].forEach(function (x) {
+      var sid = x[1], cand = x[2]; if (!cand) return;
+      h += candCard(cand, { paired: true, dim: pick !== sid });
+    });
+    return h;
+  }
+
+  /* ── 받을 수 있는 복지(✅/🔍 그룹) ── */
+  function renderGroups() {
+    var headBox = $("#wf-groups-head"), okBox = $("#wf-ok-wrap"), checkBox = $("#wf-check-wrap");
+    var act = activeTags();
+    if (!WELFARE && !FULL) {
+      headBox.innerHTML = '<div class="pb-step"><div class="pb-stepnum">2</div><div><h2 style="font-size:18px;font-weight:800;margin:2px 0">받을 수 있는 복지</h2><div class="pb-sub">데이터를 불러오는 중…</div></div></div>';
+      okBox.innerHTML = '<div class="wf-empty">복지로 데이터(5,012건)를 불러오는 중…</div>'; checkBox.innerHTML = ""; return;
+    }
+    if (act.size === 0) {
+      headBox.innerHTML = '<div class="pb-step"><div class="pb-stepnum">2</div><div><h2 style="font-size:18px;font-weight:800;margin:2px 0">받을 수 있는 복지</h2>' +
+        '<div class="pb-sub">위에서 상황을 켜면 받을 수 있는 복지를 <strong>빠짐없이</strong> 펼쳐 드립니다.</div></div></div>';
+      okBox.innerHTML = '<div class="wf-empty">아직 켠 상황이 없어요. 칩을 켜거나, 맨 위의 <strong>예시 버튼</strong>을 눌러보세요.</div>';
+      checkBox.innerHTML = ""; $("#wf-prep-card").innerHTML = ""; return;
+    }
+    var pool = applyFilters(allCandidates());
+    var groups = WF.judge3group(pool, judgeCtx());
+    LAST_OK = groups.ok; LAST_HIDDEN = groups.hidden;
+
+    headBox.innerHTML = '<div class="pb-step" style="margin-bottom:4px"><div class="pb-stepnum">2</div><div>' +
+      '<h2 style="font-size:18px;font-weight:800;margin:2px 0">받을 수 있는 복지 — 매칭 ' + (groups.ok.length + groups.check.length) + "건</h2>" +
+      '<div class="pb-sub">추천이 아니라 <strong>완전 열거</strong>입니다. 소득·연령은 거르지 않고 표시만 하며, ' +
+      '숨김(' + groups.hidden.length + "건)은 명시적 위배 100%일 때만이에요.</div></div></div>";
+
+    // ✅ 그룹 (택1 쌍은 인접 배치)
+    var okHtml = renderGroupBody(groups.ok, "ok", state.okPage);
+    okBox.innerHTML =
+      '<div class="wf-ghead wf-ghead-ok" data-gtoggle="ok"><span class="wf-gn">✅ ' + groups.ok.length + "</span>받을 수 있어요" +
+      '<span class="wf-gtoggle">' + (state.okColl ? "펼치기 ▾" : "접기 ▴") + "</span></div>" +
+      '<div class="wf-gsub">상황이 명확히 맞고 소득·연령 충돌이 없는 항목 (보수적 판정).</div>' +
+      '<div class="wf-glist"' + (state.okColl ? ' style="display:none"' : "") + ">" + okHtml + "</div>";
+
+    // 🔍 그룹 (접이식)
+    var checkHtml = renderGroupBody(groups.check, "check", state.checkPage);
+    checkBox.innerHTML =
+      '<div class="wf-ghead wf-ghead-check" data-gtoggle="check"><span class="wf-gn">🔍 ' + groups.check.length + "</span>확인이 필요해요" +
+      '<span class="wf-gtoggle">' + (state.checkColl ? "펼치기 ▾" : "접기 ▴") + "</span></div>" +
+      '<div class="wf-gsub">매칭됐지만 자격·소득 단서가 애매한 항목 — 의심되면 전부 여기에 둡니다(놓침 0).</div>' +
+      '<div class="wf-glist"' + (state.checkColl ? ' style="display:none"' : "") + ">" + checkHtml + "</div>";
+
+    renderPrep(groups.ok);
+  }
+
+  /* 그룹 본문: 택1 쌍 인접 배치 + 페이지네이션(50 cap + 더보기). */
+  function renderGroupBody(list, gkey, page) {
+    if (!list.length) return '<div class="wf-empty">이 그룹에 해당하는 항목이 없습니다.</div>';
+    var byId = {}; list.forEach(function (c) { byId[c.servId] = c; });
+    var rendered = {}, html = "", count = 0;
+    var cap = CAP * (page || 1);
+    for (var i = 0; i < list.length && count < cap; i++) {
+      var c = list[i];
+      if (rendered[c.servId]) continue;
+      // 택1 쌍? (✅ 그룹에서만 인접 라디오)
+      var pairHit = null;
+      if (gkey === "ok") {
+        for (var p = 0; p < PAIRS.length; p++) {
+          var pr = PAIRS[p];
+          if ((pr.a === c.servId || pr.b === c.servId) && byId[pr.a] && byId[pr.b]) { pairHit = pr; break; }
+        }
+      }
+      if (pairHit) {
+        html += renderPairBox(pairHit, byId[pairHit.a], byId[pairHit.b]);
+        rendered[pairHit.a] = rendered[pairHit.b] = 1; count += 2;
+      } else {
+        html += candCard(c); rendered[c.servId] = 1; count++;
+      }
+    }
+    var total = list.length;
+    if (total > cap) {
+      html += '<div class="wf-more">…외 ' + (total - cap).toLocaleString() + "건 — " +
+        '<button class="wf-morebtn" data-more="' + gkey + '">더 보기 (+' + Math.min(CAP, total - cap) + ")</button></div>";
+    }
+    return html;
+  }
+
+  /* ── 통합 준비물(후반부, 2층) ── */
+  function renderPrep(okList) {
+    var box = $("#wf-prep-card");
+    if (!okList || !okList.length) { box.innerHTML = ""; return; }
+    var merged = WF.mergeBulk(okList, judgeCtx());
+    // optional 체크 상태 정리(사라진 서류 제거)
+    var optNames = new Set(merged.optional.map(function (d) { return d.name; }));
+    state.optOn = new Set(Array.from(state.optOn).filter(function (n) { return optNames.has(n); }));
+    var optAdded = merged.optional.filter(function (d) { return state.optOn.has(d.name); });
+    var nConfirmed = merged.confirmed.length;
+    var nTotal = nConfirmed + optAdded.length;
+    // 합산 대상 지원 수(택1 반영)
+    var sel = state.pairSelected;
+    var counted = okList.filter(function (c) { return !WF.pairExcluded(c.servId, PAIRS, sel); }).length;
+
+    var h = '<div class="pb-step"><div class="pb-stepnum">3</div><div>' +
+      '<h2 style="font-size:18px;font-weight:800;margin:2px 0">통합 준비물</h2>' +
+      '<div class="pb-sub">✅ 받을 수 있는 ' + counted + "건의 서류를 합쳐 중복을 없앴어요. 한 번 떼면 여러 곳에 씁니다.</div></div></div>";
 
     h += '<div class="pb-mets">' +
-      '<div class="pb-met"><div class="pb-mv">' + ready.length + "/" + cands.length + '</div><div class="pb-mk">지금 신청 가능</div></div>' +
-      '<div class="pb-met"><div class="pb-mv">' + nOn + "/" + bulk.length + '종</div><div class="pb-mk">켜진 서류</div></div>' +
-      '<div class="pb-met"><div class="pb-mv">' + common.length + '종</div><div class="pb-mk">공통 재사용 서류</div></div></div>';
+      '<div class="pb-met"><div class="pb-mv">' + nConfirmed + '종</div><div class="pb-mk">📋 확정 준비물</div></div>' +
+      '<div class="pb-met"><div class="pb-mv">' + counted + '곳</div><div class="pb-mk">신청 가능 지원</div></div>' +
+      '<div class="pb-met"><div class="pb-mv">' + nTotal + '종</div><div class="pb-mk">옵션 포함 총 서류</div></div></div>';
 
-    h += '<div class="pb-bulk"><strong>📋 준비물 스위치 — 끄면 어떤 지원이 닫히는지 바로 보여요</strong><ul>' +
-      bulk.map(function (kv) {
-        var doc = kv[0], uses = kv[1], isOff = off.has(doc);
-        return "<li><button class=\"pb-doct" + (isOff ? " off" : "") + '" data-doc="' + esc(doc) + '" title="클릭해서 준비 여부 켜고 끄기">' +
-          '<span class="sw"></span><span class="dn">' + esc(doc) + "</span>" +
-          (uses.length > 1 ? '<span class="pb-tag">★공통 ' + uses.length + "곳</span>" : "") +
-          '<span style="color:var(--pb-muted);font-size:12px"> · ' + uses.length + "개 지원에 필요</span></button></li>";
-      }).join("") + "</ul>" +
-      (off.size ? '<button class="pb-btn2" id="wf-allon" style="margin-top:10px">모든 서류 다시 켜기</button>' : "") +
-      "</div>";
+    // 1층: 확정 통합 준비물(⭐검증 + 정형 high)
+    h += '<div class="wf-prep2"><div class="wf-pt">📋 확정 통합 준비물 — 이 ' + nConfirmed + "종이면 " + counted + "곳</div><ul>" +
+      (merged.confirmed.length ? merged.confirmed.map(function (d) {
+        return "<li>" + esc(d.name) + (d.uses.length > 1 ? ' <span class="pb-tag">★공통 ' + d.uses.length + "곳</span>" : "") + "</li>";
+      }).join("") : '<li style="color:var(--pb-muted)">확정 서류가 없습니다(검증·고신뢰 항목 없음).</li>') +
+      "</ul></div>";
 
-    h += '<div class="pb-step" style="margin-top:18px"><div class="pb-stepnum">→</div><div>' +
-      '<h2 style="font-size:18px;font-weight:800;margin:2px 0">신청 가능 ' + ready.length + "건" +
-      (dimmed.length ? " · 보류 " + dimmed.length + "건" : "") + "</h2>" +
-      '<div class="pb-sub">각 항목의 공식 페이지에서 최종 자격·수치를 확인하세요.</div></div></div>';
-
-    function card(c) {
-      var missing = WF.readyCheck(c, off);
-      var badge = (dual && c.name.indexOf("아이돌봄") !== -1) ? '<span class="pb-dualb">🟢 맞벌이 우선</span>' : "";
-      return '<div class="pb-bcard' + (missing.length ? " pb-dim" : "") + '"><h3>' + esc(c.name) + badge + "</h3>" +
-        '<div class="pb-ben">' + esc(c.benefit) + "</div>" +
-        '<div class="pb-meta">신청: ' + esc(c.how_to_apply) + "<br>기한: " + esc(c.deadline) +
-        "<br>서류: " + esc(c.documents.join(", ")) +
-        "<br>신뢰도: <span class=\"pb-conf\">" + esc(c.confidence) + "</span>  " +
-        '<a href="' + esc(c.source_url || "#") + '" target="_blank" rel="noopener">공식 페이지 ↗</a></div>' +
-        (missing.length ? '<div class="pb-offnote">🔌 꺼진 서류 때문에 지금은 신청 불가: ' + esc(missing.join(", ")) + "</div>" : "") +
-        "</div>";
+    // 2층: 더 추가(정형 저신뢰 옵션 체크)
+    if (merged.optional.length) {
+      h += '<div class="wf-prep2 wf-opt"><div class="wf-pt">➕ 더 추가 — 정형 데이터 기반(신청처 확인 권장)</div><ul>' +
+        merged.optional.map(function (d) {
+          var on = state.optOn.has(d.name);
+          return "<li><button class=\"wf-optdoc" + (on ? " on" : "") + '" data-opt="' + esc(d.name) + '">' +
+            '<span class="ck"></span><span>' + esc(d.name) +
+            (d.uses.length > 1 ? ' <span class="pb-tag">★공통 ' + d.uses.length + "곳</span>" : "") + "</span></button></li>";
+        }).join("") + "</ul></div>";
     }
-    h += ready.map(card).join("") + dimmed.map(card).join("");
-    h += '<div class="pb-next" style="margin-top:6px">다음 행동: 공통 서류부터 준비 → 공식 페이지에서 신청 → 묶음대로 제출. ' +
-      "(수치·자격은 공식 출처로 확인 / 보육 형태에 따라 가정양육수당↔보육료가 갈립니다)</div>";
+
+    h += '<button class="pb-btn2" id="wf-dl" style="margin-top:6px">📥 통합 체크리스트 내려받기 (.md)</button>';
+    h += '<div class="pb-next" style="margin-top:10px">다음 행동: 확정 서류부터 한 번에 발급 → 각 공식 페이지에서 신청 → 묶음대로 제출. ' +
+      "수치·자격·기한은 반드시 공식 출처에서 최종 확인하세요.</div>";
     box.innerHTML = h;
   }
 
-  /* ── 🔄 복지로 전체 섹션 ── */
-  function renderFull() {
-    var headBox = $("#wf-full-head"), listBox = $("#wf-full-list");
-    var headTitle = function (t, sub) {
-      return '<div class="pb-step" style="margin-bottom:6px"><div class="pb-stepnum">＋</div><div>' +
-        '<h2 style="font-size:18px;font-weight:800;margin:2px 0">' + t +
-        '<span class="wf-trust wf-trust-full">🔄 복지로 수집 데이터 · 그대로 비추기</span></h2>' +
-        '<div class="pb-sub">' + sub + "</div></div></div>";
-    };
-    if (!FULL) {
-      headBox.innerHTML = headTitle("복지로 전체에서 더 찾기",
-        "복지로 " + COLLECTED_AT + " 수집 · 5,012건 · 88%는 공공데이터포털 공식 태그 — 로딩 중입니다.");
-      return;
+  /* 통합 체크리스트 .md 생성·다운로드 */
+  function downloadChecklist() {
+    if (!LAST_OK || !LAST_OK.length) return;
+    var merged = WF.mergeBulk(LAST_OK, judgeCtx());
+    var sel = state.pairSelected;
+    var counted = LAST_OK.filter(function (c) { return !WF.pairExcluded(c.servId, PAIRS, sel); });
+    var lines = ["# 통합 준비물 체크리스트", "", "조건에 맞아 '받을 수 있어요'로 분류된 " + counted.length + "개 지원의 서류를 합쳤습니다.", ""];
+    lines.push("## 📋 확정 통합 준비물 (⭐검증 + 고신뢰)");
+    merged.confirmed.forEach(function (d) { lines.push("- [ ] " + d.name + (d.uses.length > 1 ? " (공통 " + d.uses.length + "곳)" : "")); });
+    if (!merged.confirmed.length) lines.push("- (없음)");
+    var optAdded = merged.optional.filter(function (d) { return state.optOn.has(d.name); });
+    if (optAdded.length) {
+      lines.push("", "## ➕ 추가 선택한 서류 (정형 데이터 · 신청처 확인 권장)");
+      optAdded.forEach(function (d) { lines.push("- [ ] " + d.name); });
     }
-    var act = activeTags(), loc = currentLoc();
-    var hits = WF.matchFull(FULL, act, loc, state.q);
-    // KPI 원칙(이슈 #2·#3): 상세 보유(큐레이션 등급) 우선 정렬 — 행동 가능한 것부터
-    hits = hits.slice().sort(function (a, b) {
-      var da = WF.details && WF.details[a.id] ? 0 : 1;
-      var db = WF.details && WF.details[b.id] ? 0 : 1;
-      if (da !== db) return da - db;
-      var ra = a.region ? 1 : 0, rb = b.region ? 1 : 0;
-      if (ra !== rb) return ra - rb;
-      return a.name < b.name ? -1 : 1;
-    });
-    var nDetail = hits.filter(function (h) { return WF.details && WF.details[h.id]; }).length;
-    var nCentral = hits.filter(function (h) { return !h.region; }).length;
-    // 이슈 #1: 이 섹션은 상황·지역만 매칭 — 소득/보육/서류 스위치는 미적용임을 명시
-    var unapplied = state.income !== null || state.on.has("child");
-    var scopeNote = unapplied
-      ? '<div class="wf-scope wf-scope-warn">⚠️ <strong>지금 선택한 소득/보육 조건은 이 목록엔 적용되지 않습니다.</strong> ' +
-        "이 목록은 <strong>상황·지역 기준 매칭</strong>이에요 — 자격·금액은 각 항목의 복지로 상세에서 확인하세요.</div>"
-      : '<div class="wf-scope">이 목록은 <strong>상황·지역 기준 매칭</strong>입니다 — 소득·보육형태·서류 스위치는 적용되지 않아요. ' +
-        "자격·금액은 각 항목의 복지로 상세에서 확인하세요.</div>";
-    headBox.innerHTML = headTitle(
-      "복지로 전체에서 " + hits.length.toLocaleString() + "건 " + (act.size ? "더 찾았어요" : "(상황을 켜면 좁혀져요)") +
-      " <span style=\"font-weight:600;font-size:13px;color:var(--pb-muted)\">전국 " + nCentral +
-      " · 지역 " + (hits.length - nCentral) +
-      (nDetail ? ' · <span style="color:var(--pb-ok)">📖 자세히 보기 가능 ' + nDetail + "건</span>" : "") + "</span>",
-      "복지로 " + COLLECTED_AT + " 수집 · 88%는 공공데이터포털 공식 태그 — 자격·금액은 상세에서 확인하세요." +
-      (loc ? "" : " 지역을 고르면 지자체 지원도 함께 나옵니다.")) + scopeNote;
-    var shown = hits.slice(0, CAP);
-    listBox.innerHTML = shown.map(function (it) {
-      var reg = it.region;
-      var ben = it.benefit || "";
-      if (ben.length > 120) ben = ben.slice(0, 120) + "…";
-      var confCls = it.confidence === "공공데이터포털 공식" ? "wf-conf-off" : "wf-conf-auto";
-      var hasDetail = WF.details && WF.details[it.id];
-      var pc = (it.provision || it.cycle)
-        ? '<span class="wf-pc">' + esc([it.provision, it.cycle].filter(Boolean).join(" · ")) + "</span>" : "";
-      return '<div class="wf-fcard"><div><strong>' + esc(it.name) + "</strong>" +
-        '<span class="pb-tag">' + (reg ? esc(reg) : "전국") + "</span>" +
-        ' <span class="' + confCls + '" style="font-size:11px">' + esc(it.confidence) + "</span></div>" +
-        '<div class="wf-fben">' + esc(ben) + "</div>" +
-        '<div class="wf-fmeta">' + esc(it.agency || "") + "  " +
-        '<a href="' + esc(it.source_url) + '" target="_blank" rel="noopener">복지로 상세 ↗</a>' +
-        (it.online ? '<span class="wf-online">🖥 온라인 신청 가능</span>' : "") + pc + "</div>" +
-        (hasDetail
-          ? '<button class="wf-dtoggle" data-servid="' + esc(it.id) + '">자세히 보기 ▾</button><div class="wf-detail"></div>'
-          : "") +
-        "</div>";
-    }).join("") || '<div class="wf-empty">조건·검색어에 맞는 항목이 없습니다. 검색어를 지우거나 상황을 바꿔보세요.</div>';
-    if (hits.length > CAP) {
-      listBox.innerHTML += '<div class="wf-more">…외 ' + (hits.length - CAP).toLocaleString() +
-        "건 — 검색어로 좁혀보세요.</div>";
-    }
+    lines.push("", "## 신청 대상");
+    counted.forEach(function (c) { lines.push("- " + c.name + (c.source_url ? " — " + c.source_url : "")); });
+    lines.push("", "※ 본 도구는 자격을 판정하지 않습니다. 수치·자격·기한은 각 공식 페이지에서 최종 확인하세요.");
+    var blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "통합준비물_체크리스트.md";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 
-  function renderAll() { renderCuration(); renderFull(); }
+  function renderAll() { CANDS = null; renderGroups(); }
 
   /* ── 상세 펼침 빌더 (이슈 #2) — central_details.json 기반, 펼칠 때 1회 생성 ── */
   var CLAMP = 300;
@@ -566,29 +831,48 @@
     if (t.dataset && t.dataset.branch) {
       t.checked ? state.on.add(t.dataset.branch) : state.on.delete(t.dataset.branch);
       $("#wf-drill").style.display = state.on.has("child") ? "block" : "none";
-      renderAll();
+      resetPaging(); renderAll();
     } else if (t.dataset && t.dataset.age) {
       t.checked ? state.ages.add(t.dataset.age) : state.ages.delete(t.dataset.age);
-      renderAll();
+      resetPaging(); renderAll();
     } else if (t.name === "care") {
-      state.care = t.value; renderAll();
+      state.care = t.value; resetPaging(); renderAll();
     } else if (t.id === "wf-income") {
-      state.income = t.value ? parseInt(t.value, 10) : null; renderAll();
+      state.income = t.value ? parseInt(t.value, 10) : null; resetPaging(); renderAll();
     } else if (t.id === "wf-sido") {
-      state.sido = t.value; state.gugun = ""; buildGugun(); renderAll();
+      state.sido = t.value; state.gugun = ""; buildGugun(); resetPaging(); renderAll();
     } else if (t.id === "wf-gugun") {
-      state.gugun = t.value; renderAll();
+      state.gugun = t.value; resetPaging(); renderAll();
+    } else if (t.dataset && t.dataset.pairkey) {
+      // 택1 라디오 — 선택한 쪽만 ✅ 합산, 반대쪽은 회색
+      state.pairSelected[t.dataset.pairkey] = t.dataset.pairval;
+      renderGroups();
     }
   });
   document.addEventListener("click", function (e) {
+    // 그룹 헤더(접기/펼치기) — 버튼이 아닌 div
+    var ghead = e.target.closest ? e.target.closest("[data-gtoggle]") : null;
+    if (ghead) {
+      var g = ghead.dataset.gtoggle;
+      if (g === "ok") state.okColl = !state.okColl;
+      else if (g === "check") state.checkColl = !state.checkColl;
+      renderGroups();
+      return;
+    }
     var btn = e.target.closest ? e.target.closest("button") : null;
     if (!btn) return;
-    if (btn.dataset && btn.dataset.doc) {
-      var d = btn.dataset.doc;
-      state.docsOff.has(d) ? state.docsOff.delete(d) : state.docsOff.add(d);
-      renderCuration();
-    } else if (btn.id === "wf-allon") {
-      state.docsOff = new Set(); renderCuration();
+    if (btn.dataset && btn.dataset.more) {
+      // 그룹 더 보기(완전 열거 — 누락 0)
+      if (btn.dataset.more === "ok") state.okPage++;
+      else if (btn.dataset.more === "check") state.checkPage++;
+      renderGroups();
+    } else if (btn.dataset && btn.dataset.opt) {
+      // 통합 준비물 2층: 옵션 서류 추가/제거
+      var nm = btn.dataset.opt;
+      state.optOn.has(nm) ? state.optOn.delete(nm) : state.optOn.add(nm);
+      renderPrep(LAST_OK);
+    } else if (btn.id === "wf-dl") {
+      downloadChecklist();
     } else if (btn.classList.contains("wf-dtoggle")) {
       var panel = btn.nextElementSibling;
       if (!panel || !panel.classList.contains("wf-detail")) return;
@@ -598,16 +882,18 @@
       var open = panel.classList.toggle("wf-open");
       btn.textContent = open ? "접기 ▴" : "자세히 보기 ▾";
     } else if (btn.classList.contains("wf-morebtn")) {
+      // 상세 본문 텍스트 더보기(클램프 해제)
       var shortEl = btn.previousElementSibling && btn.previousElementSibling.previousElementSibling;
       var fullEl = btn.previousElementSibling;
       if (shortEl && fullEl) { shortEl.style.display = "none"; fullEl.style.display = ""; }
       btn.style.display = "none";
     }
   });
+  function resetPaging() { state.okPage = 1; state.checkPage = 1; }
   var qTimer = null;
   $("#wf-q").addEventListener("input", function (e) {
     clearTimeout(qTimer);
-    qTimer = setTimeout(function () { state.q = e.target.value; renderFull(); }, 200);
+    qTimer = setTimeout(function () { state.q = e.target.value; resetPaging(); renderAll(); }, 200);
   });
 
   /* ── 데모 시나리오 (빈 화면 금지) ── */
@@ -631,19 +917,23 @@
   /* ── 초기화 ── */
   renderChips(); renderAll();
   var pCur = fetch("data/welfare.json").then(function (r) { return r.json(); })
-    .then(function (j) { WELFARE = j; renderCuration(); });
+    .then(function (j) { WELFARE = j; renderAll(); });
   var pFull = fetch("data/welfare_full.json").then(function (r) { return r.json(); })
-    .then(function (j) { FULL = j; buildSido(); buildGugun(); renderFull(); });
+    .then(function (j) { FULL = j; buildSido(); buildGugun(); renderAll(); });
   // 상세 1,079건 — 실패해도 목록은 그대로 동작(토글만 안 나타남)
   var pDet = fetch("data/central_details.json").then(function (r) { return r.json(); })
-    .then(function (j) { WF.details = j; if (FULL) renderFull(); })
+    .then(function (j) { WF.details = j; renderAll(); })
     .catch(function () { WF.details = {}; });
   // 정형화 자격·서류 1,079건 (LLM 추출 → 표준화)
   var pElig = fetch("data/eligibility.json").then(function (r) { return r.json(); })
-    .then(function (j) { WF.elig = j; if (FULL) renderFull(); })
+    .then(function (j) { WF.elig = j; renderAll(); })
     .catch(function () { WF.elig = {}; });
-  dataReady = Promise.all([pCur, pFull, pDet, pElig]).catch(function (err) {
-    $("#wf-full-list").innerHTML = '<div class="wf-empty">데이터를 불러오지 못했어요 (' + esc(err.message) +
+  // 동시수급 택1 쌍(확실한 양자택일만) — 없어도 동작
+  var pPair = fetch("data/exclusion_pairs.json").then(function (r) { return r.json(); })
+    .then(function (j) { PAIRS = Array.isArray(j) ? j : []; renderAll(); })
+    .catch(function () { PAIRS = []; });
+  dataReady = Promise.all([pCur, pFull, pDet, pElig, pPair]).catch(function (err) {
+    $("#wf-ok-wrap").innerHTML = '<div class="wf-empty">데이터를 불러오지 못했어요 (' + esc(err.message) +
       "). GitHub Pages나 로컬 서버(http)로 열어주세요 — file:// 직접 열기는 지원되지 않습니다.</div>";
   });
 })();
